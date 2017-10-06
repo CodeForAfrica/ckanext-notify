@@ -9,7 +9,6 @@ import ckanext.notify.constants as constants
 from urllib import urlencode
 
 from ckan.common import request
-from ckanext.datarequests.controllers.ui_controller import DataRequestsUI
 
 
 log = logging.getLogger(__name__)
@@ -47,6 +46,20 @@ class DataRequestsNotifyUI(base.BaseController):
     def _get_context(self):
         return {'model': model, 'session': model.Session,
                 'user': c.user, 'auth_user_obj': c.userobj}
+
+    def organization_channels(self, id):
+        context = self._get_context()
+        c.group_dict = tk.get_action('organization_show')(context, {'id': id})
+        c.group_dict['channels'] = ['slack', 'email']
+        print('Group CKAN', c.group_dict)
+        return tk.render('organization/channels.html', extra_vars=None)
+
+    def slack_form(self, id):
+        context = self._get_context()
+        c.group_dict = tk.get_action('organization_show')(context, {'id': id})
+        return tk.render('organization/slack_form.html', extra_vars=None)
+
+
 
     def _show_index(self, user_id, organization_id, include_organization_facet, url_func, file_to_render):
 
@@ -158,11 +171,6 @@ class DataRequestsNotifyUI(base.BaseController):
                 c.errors = e.error_dict
                 c.errors_summary = _get_errors_summary(c.errors)
 
-    def organization_channels(self, id):
-        context = self._get_context()
-        c.group_dict = tk.get_action('organization_show')(context, {'id': id})
-        url_func = functools.partial(org_datarequest_url, id=id)
-        return self._show_index(None, id, False, url_func, 'organization/channels.html')
 
     # def organization_slack(self):
     #     return tk.render('organization/slack.html')

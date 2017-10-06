@@ -26,9 +26,14 @@ class NotifyPlugin(plugins.SingletonPlugin):
         return additional_actions
 
     def before_map(self, map):
-        # Channels that belongs to an organization
+
+        # Channels that an organization can subscribe to be notified with
         map.connect('organization_channels', '/organization/channels/{id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
-                    action='organization_channels', conditions=dict(method=['GET']), ckan_icon='question-sign')
+                    action='organization_channels', conditions=dict(method=['GET']), ckan_icon='bell')
+
+        map.connect('slack_form', '/organization/channels/slack/{id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='slack_form', conditions=dict(method=['GET']))
 
         return map

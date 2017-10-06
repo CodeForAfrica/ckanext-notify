@@ -1,0 +1,31 @@
+{% extends "organization/read_base.html" %}
+{% import "macros/form.html" as form %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="/base/css/channels.css" />
+{% endblock %}
+
+{% block primary_content_inner %}
+    <div class="channel-page">
+        <div class="channel-page-header">
+            <h2>Slack Notification</h2>
+            <p>Get notified on slack about datarequest activities concerning your organization</p>
+        </div>
+    </div>
+    <form id="user-register-form" class="form-horizontal channels" action="" method="post">
+
+      {{ form.input("webhook", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T79MRP894/B79..."), classes=["control-medium"]) }}
+      {{ form.input("channel", id="field-channel", label=_("Channel"), placeholder=_("datarequests"), classes=["control-medium"]) }}
+
+      {% if g.recaptcha_publickey %}
+        {% snippet "user/snippets/recaptcha.html", public_key=g.recaptcha_publickey %}
+      {% endif %}
+
+      <div class="form-actions">
+        {% block form_actions %}
+        <button class="btn btn-primary" type="submit" name="save">{{ _("Get Notifications") }}</button>
+        {% endblock %}
+      </div>
+    </form>
+{% endblock %}
