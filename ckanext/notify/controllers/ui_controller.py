@@ -24,21 +24,24 @@ class DataRequestsNotifyUI(base.BaseController):
     def organization_channels(self, id):
         context = self._get_context()
         c.group_dict = tk.get_action('organization_show')(context, {'id': id})
-        c.group_dict['channels'] = ['slack', 'email']
         return tk.render('organization/channels.html', extra_vars=None)
 
     def slack_form(self, id):
         context = self._get_context()
+        c.data = {}
         c.group_dict = tk.get_action('organization_show')(context, {'id': id})
-        return tk.render('organization/slack_form.html', extra_vars=None)
+        self.post_slack_form(id, constants.DATAREQUEST_REGISTER_SLACK, context)
+        return tk.render('organization/slack_form.html', extra_vars={'data': c.data})
 
-    def post_slack_form(self):
-        context = self._get_context()
-        action = constants.DATAREQUEST_REGISTER_SLACK
+    def post_slack_form(self, id, action, context):
+        # context = self._get_context()
+        # action = constants.DATAREQUEST_REGISTER_SLACK
         if request.POST:
             data_dict = dict()
             data_dict['webhook'] = request.POST.get('webhook', '')
             data_dict['channel'] = request.POST.get('channel', '')
+            data_dict['id'] = id
+            print('Data Dict', data_dict)
 
             try:
                 result = tk.get_action(action)(context, data_dict)
@@ -46,7 +49,7 @@ class DataRequestsNotifyUI(base.BaseController):
             except tk.ValidationError as e:
                 log.warn(e)
                 # Fill the fields that will display some information in the page
-                c.datarequest_notify = {
+                c.data = {
                     'id': data_dict.get('id', ''),
                     'webhook': data_dict.get('webhook', ''),
                     'chnnel': data_dict.get('channel', '')

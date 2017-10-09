@@ -1,6 +1,9 @@
 {% extends "organization/read_base.html" %}
 {% import "macros/form.html" as form %}
 
+{% set webhook = data.get('webhook', '') %}
+{% set channel = data.get('channel', '') %}
+
 {% block styles %}
     {{ super() }}
     <link rel="stylesheet" href="/base/css/channels.css" />
@@ -15,8 +18,8 @@
     </div>
     <form id="user-register-form" class="form-horizontal channels" action="" method="post">
 
-      {{ form.input("webhook", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T79MRP894/B79..."), classes=["control-medium"]) }}
-      {{ form.input("channel", id="field-channel", label=_("Channel"), placeholder=_("datarequests"), classes=["control-medium"]) }}
+      {{ form.input("webhook", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T79MRP394/B69..."), value=webhook, classes=["control-medium"], is_required=true) }}
+      {{ form.input("channel", id="field-channel", label=_("Channel"), placeholder=_("datarequest_activities"), value=channel, classes=["control-medium"], is_required=true) }}
 
       {% if g.recaptcha_publickey %}
         {% snippet "user/snippets/recaptcha.html", public_key=g.recaptcha_publickey %}
