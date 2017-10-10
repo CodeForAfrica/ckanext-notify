@@ -1,0 +1,28 @@
+{% import "macros/form.html" as form %}
+
+{% set webhook = data.get('webhook', '') %}
+{% set channel = data.get('channel', '') %}
+
+{# This renders a form for an organization to register their slack details. It can
+then itself be extended to add/remove blocks of functionality. #}
+
+<form class="form-horizontal channels" action="" method="post">
+
+  {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
+
+  {% block webhook %}
+    {{ form.input("webhook", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
+  {% endblock %}
+
+  {% block channel %}
+    {{ form.input("channel", id="field-channel", label=_("Channel"), placeholder=_("eg. datarequest_activities"), value=data.channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
+  {% endblock %}
+
+  <div class="form-actions">
+    {% block form_actions %}
+    <button class="btn btn-primary" type="submit" name="save">{{ _("Get Notifications") }}</button>
+    {% endblock %}
+  </div>
+
+
+</form>

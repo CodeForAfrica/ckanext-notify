@@ -3,7 +3,7 @@ import ckan.model as model
 import ckan.lib.base as base
 import ckan.plugins as plugins
 import ckan.lib.mailer as mailer
-import ckanext.notify.constants as constants
+import constants
 import validator
 import datetime
 import requests

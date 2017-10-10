@@ -102,3 +102,6 @@ ENV/
 
 #IDE files
 .idea
+
+#Solr files
+solr

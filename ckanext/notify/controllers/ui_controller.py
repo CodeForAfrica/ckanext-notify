@@ -1,18 +1,24 @@
 import logging
-import json
-import functools
 import ckan.model as model
 import ckan.lib.base as base
-import ckan.lib.helpers as helpers
 import ckan.plugins as plugins
+import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
 
-from urllib import urlencode
 from ckan.common import request
 
 log = logging.getLogger(__name__)
-tk = plugins.toolkit
-c = tk.c
+toolkit = plugins.toolkit
+c = toolkit.c
+
+
+def _get_errors_summary(errors):
+    errors_summary = {}
+
+    for key, error in errors.items():
+        errors_summary[key] = ', '.join(error)
+
+    return errors_summary
 
 
 class DataRequestsNotifyUI(base.BaseController):
@@ -23,19 +29,31 @@ class DataRequestsNotifyUI(base.BaseController):
 
     def organization_channels(self, id):
         context = self._get_context()
-        c.group_dict = tk.get_action('organization_show')(context, {'id': id})
-        return tk.render('organization/channels.html', extra_vars=None)
+        c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
+        return toolkit.render('notify/channels.html')
 
     def slack_form(self, id):
         context = self._get_context()
-        c.data = {}
-        c.group_dict = tk.get_action('organization_show')(context, {'id': id})
-        self.post_slack_form(id, constants.DATAREQUEST_REGISTER_SLACK, context)
-        return tk.render('organization/slack_form.html', extra_vars={'data': c.data})
+
+        # Basic initialization
+        c.slack_data = {}
+        c.errors = {}
+        c.errors_summary = {}
+
+        # Check access
+        try:
+            toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, {'org_id': id})
+            self.post_slack_form(id, constants.DATAREQUEST_REGISTER_SLACK, context)
+
+            c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
+            required_vars = {'data': c.slack_data, 'errors': c.errors, 'error_summary': c.errors_summary}
+            return toolkit.render('notify/register_slack.html', extra_vars=required_vars)
+
+        except toolkit.NotAuthorized as e:
+            log.warn(e)
+            toolkit.abort(403, toolkit._('Unauthorized to register slack details for this organization'))
 
     def post_slack_form(self, id, action, context):
-        # context = self._get_context()
-        # action = constants.DATAREQUEST_REGISTER_SLACK
         if request.POST:
             data_dict = dict()
             data_dict['webhook'] = request.POST.get('webhook', '')
@@ -44,13 +62,15 @@ class DataRequestsNotifyUI(base.BaseController):
             print('Data Dict', data_dict)
 
             try:
-                result = tk.get_action(action)(context, data_dict)
+                result = toolkit.get_action(action)(context, data_dict)
                 print('Result', result)
-            except tk.ValidationError as e:
+            except toolkit.ValidationError as e:
                 log.warn(e)
                 # Fill the fields that will display some information in the page
-                c.data = {
+                c.slack_data = {
                     'id': data_dict.get('id', ''),
                     'webhook': data_dict.get('webhook', ''),
-                    'chnnel': data_dict.get('channel', '')
+                    'channel': data_dict.get('channel', '')
                 }
+                c.errors = e.error_dict
+                c.errors_summary = _get_errors_summary(c.errors)
