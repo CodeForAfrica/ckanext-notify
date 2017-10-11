@@ -70,7 +70,7 @@ def datarequest_register_slack(context, data_dict):
     db.init_db(model)
 
     # Check access
-    # tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
 
     # Validate data
     validator.validate_slack_form(context, data_dict)

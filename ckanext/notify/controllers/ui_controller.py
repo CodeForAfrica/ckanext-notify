@@ -40,9 +40,8 @@ class DataRequestsNotifyUI(base.BaseController):
         c.errors = {}
         c.errors_summary = {}
 
-        # Check access
         try:
-            toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, {'org_id': id})
+            toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, {'id': id})
             self.post_slack_form(id, constants.DATAREQUEST_REGISTER_SLACK, context)
 
             c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
@@ -50,22 +49,22 @@ class DataRequestsNotifyUI(base.BaseController):
             return toolkit.render('notify/register_slack.html', extra_vars=required_vars)
 
         except toolkit.NotAuthorized as e:
-            log.warn(e)
+            log.warning(e)
             toolkit.abort(403, toolkit._('Unauthorized to register slack details for this organization'))
 
     def post_slack_form(self, id, action, context):
         if request.POST:
             data_dict = dict()
             data_dict['webhook'] = request.POST.get('webhook', '')
-            data_dict['channel'] = request.POST.get('channel', '')
+            data_dict['channel'] = request.POST.get('channel', '').lower()
             data_dict['id'] = id
-            print('Data Dict', data_dict)
 
             try:
-                result = toolkit.get_action(action)(context, data_dict)
-                print('Result', result)
+                toolkit.get_action(action)(context, data_dict)
+                helpers.flash_success(toolkit._('You have successfully added your slack notification channel'))
+                toolkit.redirect_to('organization_channels', id=id)
             except toolkit.ValidationError as e:
-                log.warn(e)
+                log.warning(e)
                 # Fill the fields that will display some information in the page
                 c.slack_data = {
                     'id': data_dict.get('id', ''),

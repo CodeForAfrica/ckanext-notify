@@ -7,10 +7,10 @@ toolkit = plugins.toolkit
 
 
 class NotifyPlugin(plugins.SingletonPlugin):
-    plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
+    plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IRoutes, inherit=True)
-    plugins.implements(plugins.IActions, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
 
     # IConfigurer
@@ -31,7 +31,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
 
         return additional_actions
 
-    # IAuth
+    # IAuthFunctions
 
     def get_auth_functions(self):
         auth_functions = {
