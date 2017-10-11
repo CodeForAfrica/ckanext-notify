@@ -35,3 +35,10 @@ def validate_slack_form(context, request_data):
 
     if len(errors) > 0:
         raise toolkit.ValidationError(errors)
+
+
+def validate_email_form(context, request_data):
+    errors = {}
+
+    if len(request_data['email']) is 0:
+        errors[toolkit._('Email')] = [toolkit._('Email cannot be empty')]
