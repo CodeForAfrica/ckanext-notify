@@ -6,6 +6,7 @@ import ckan.lib.mailer as mailer
 import constants
 import validator
 import datetime
+import json
 import requests
 import db
 
@@ -83,6 +84,70 @@ def datarequest_register_slack(context, data_dict):
     session.commit()
 
     return _dictize_slack_details(slack_details)
+
+
+def _dictize_email_details(email_details):
+
+    # Convert the slack details into a dict
+    data_dict = {
+        'id': email_details.id,
+        'email': email_details.email,
+        'organization_id': email_details.organization_id
+    }
+
+    return data_dict
+
+
+def _undictize_email_basic(email_details, data_dict):
+    email_details.email = data_dict['email']
+    email_details.organization_id = data_dict['id']
+
+
+def datarequest_register_email(context, data_dict):
+    '''
+    Action to register the organization email address used for notifications.
+    The function checks the access rights of the user before creating the
+    data request. If the user is not allowed a NotAuthorized exception will be risen.
+
+    In addition, you should note that the parameters will be checked and an
+    exception (ValidationError) will be risen if some of these parameters are
+    not valid.
+
+    :param title: The title of the data request
+    :type title: string
+
+    :param description: A brief description for your data request
+    :type description: string
+
+    :param organiztion_id: The ID of the organization you want to asign the
+        data request (optional).
+    :type organization_id: string
+
+    :returns: A dict with the data request (id, user_id, title, description,
+        organization_id, open_time, accepted_dataset, close_time, closed)
+    :rtype: dict
+    '''
+
+    model = context['model']
+    session = context['session']
+
+    # Init the data base
+    db.init_db(model)
+
+    # Check access
+    # tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+
+    # Validate data
+    validator.validate_email_form(context, data_dict)
+
+    # Store the data
+    email_details = db.Org_Email_Details()
+    _undictize_email_basic(email_details, data_dict)
+
+    session.add(email_details)
+    session.commit()
+
+    return _dictize_email_details(email_details)
 
 
 def send_slack_message(slack_data):
