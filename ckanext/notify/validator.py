@@ -12,25 +12,25 @@ def validate_slack_form(context, request_data):
     errors = {}
 
     # Check webhook_url
-    if len(request_data['webhook']) > constants.WEBHOOK_MAX_LENGTH:
+    if len(request_data['webhook_url']) > constants.WEBHOOK_MAX_LENGTH:
         errors[toolkit._('Webhook URL')] =\
             [toolkit._('Webhook URL must be a maximum of %d characters long') % constants.WEBHOOK_MAX_LENGTH]
 
-    if not _slack_webhook.match(request_data['webhook']):
+    if not _slack_webhook.match(request_data['webhook_url']):
         errors[toolkit._('Webhook URL')] = [toolkit._('Webhook URL is not in the correct format')]
 
-    if not request_data['webhook']:
+    if not request_data['webhook_url']:
         errors[toolkit._('Webhook URL')] = [toolkit._('Webhook URL cannot be empty')]
 
     # Check channel
-    if len(request_data['channel']) > constants.CHANNEL_MAX_LENGTH:
+    if len(request_data['slack_channel']) > constants.CHANNEL_MAX_LENGTH:
         errors[toolkit._('Channel')] =\
             [toolkit._('Channel must be a maximum of %d characters long') % constants.CHANNEL_MAX_LENGTH]
 
-    if _space_or_period.search(request_data['channel']):
+    if _space_or_period.search(request_data['slack_channel']):
         errors[toolkit._('Channel')] = [toolkit._('Channel must be lowercase, without hash, space or periods')]
 
-    if not request_data['channel']:
+    if not request_data['slack_channel']:
         errors[toolkit._('Channel')] = [toolkit._('Channel cannot be empty')]
 
     if len(errors) > 0:

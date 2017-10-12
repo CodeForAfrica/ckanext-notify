@@ -26,6 +26,8 @@ class NotifyPlugin(plugins.SingletonPlugin):
         additional_actions = {
             constants.DATAREQUEST_REGISTER_SLACK: actions.datarequest_register_slack,
             constants.SLACK_CHANNELS_SHOW: actions.slack_channels_show,
+            constants.SLACK_CHANNEL_SHOW: actions.slack_channel_show,
+            constants.SLACK_CHANNEL_UPDATE: actions.slack_channel_update,
             constants.DATAREQUEST_SEND_EMAIL_NOTIFICATION: actions.datarequest_email_notification,
             constants.DATAREQUEST_SEND_SLACK_NOTIFICATION: actions.datarequest_send_slack_notification,
         }
@@ -54,5 +56,10 @@ class NotifyPlugin(plugins.SingletonPlugin):
         map.connect('slack_form', '/organization/channels/slack/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='slack_form', conditions=dict(method=['GET', 'POST']))
+
+        # Update Slack Channel
+        map.connect('update_slack_form', '/organization/channels/slack/edit/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='update_slack_details', conditions=dict(method=['GET', 'POST']))
 
         return map

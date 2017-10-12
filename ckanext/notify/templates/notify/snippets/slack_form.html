@@ -1,7 +1,7 @@
 {% import "macros/form.html" as form %}
 
-{% set webhook = data.get('webhook', '') %}
-{% set channel = data.get('channel', '') %}
+{% set webhook_url = data.get('webhook_url', '') %}
+{% set slack_channel = data.get('slack_channel', '') %}
 
 {# This renders a form for an organization to register their slack details. It can
 then itself be extended to add/remove blocks of functionality. #}
@@ -13,11 +13,11 @@ then itself be extended to add/remove blocks of functionality. #}
   {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
 
   {% block webhook %}
-    {{ form.input("webhook", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
+    {{ form.input("webhook_url", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook_url, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
   {% endblock %}
 
   {% block channel %}
-    {{ form.input("channel", id="field-channel", label=_("Channel"), placeholder=_("eg. datarequest_activities"), value=data.channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
+    {{ form.input("slack_channel", id="field-channel", label=_("Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
   {% endblock %}
 
   <div class="form-actions">

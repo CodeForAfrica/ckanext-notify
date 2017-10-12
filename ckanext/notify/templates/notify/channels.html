@@ -61,7 +61,7 @@
             <td>
 
               <div class="btn-group pull-right">
-                <a class="btn btn-small" href="#" title="{{ _('Edit') }}">
+                <a class="btn btn-small" href="{{ h.url_for('update_slack_form', id=channel.id, organization_id=channel.organization_id) }}" title="{{ _('Edit') }}">
                   <i class="icon-wrench"></i>
                 </a>
                 <a class="btn btn-danger btn-small" href="#" data-module="confirm-action" data-module-i18n="{{ locale }}" title="{{ _('Delete') }}">{% block delete_button_text %}<i class="icon-remove"></i>{% endblock %}</a>
