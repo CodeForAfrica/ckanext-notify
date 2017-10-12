@@ -35,7 +35,7 @@ def _dictize_slack_details(slack_details):
 def _undictize_slack_basic(slack_details, data_dict):
     slack_details.webhook_url = data_dict['webhook']
     slack_details.slack_channel = data_dict['channel']
-    slack_details.organization_id = data_dict['id']
+    slack_details.organization_id = data_dict['organization_id']
 
 
 def datarequest_register_slack(context, data_dict):
@@ -83,6 +83,108 @@ def datarequest_register_slack(context, data_dict):
     session.commit()
 
     return _dictize_slack_details(slack_details)
+
+
+def slack_channels_show(context, data_dict):
+    '''
+    Action to retrieve the slack notification channels. The only required
+    parameter is the name of the organization passed as id. A NotFound exception will be
+    risen if the given id is not found.
+
+    Access rights will be checked before returning the information and an
+    exception will be risen (NotAuthorized) if the user is not authorized.
+
+    :param id: The id of the organization to be shown
+    :type id: string
+
+    :returns: A list of the slack notification details(id,
+        organization_id, webhook_url, slack_channel)
+    :rtype: list
+    '''
+
+    model = context['model']
+    organization_id = data_dict.get('organization_id', '')
+
+    if not organization_id:
+        raise tk.ValidationError(tk._('Organization ID has not been included'))
+
+    # Init the data base
+    db.init_db(model)
+
+    # Check access
+    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+
+    # Get the data request
+    result = db.Org_Slack_Details.get(organization_id=organization_id)
+    if not result:
+        raise tk.ObjectNotFound(tk._('Organization %s not found in the data base') % organization_id)
+
+    slack_channels = [_dictize_slack_details(channel) for channel in result]
+
+    return slack_channels
+
+
+def slack_channels_update(context, data_dict):
+    '''
+    Action to update a data request. The function checks the access rights of
+    the user before updating the data request. If the user is not allowed
+    a NotAuthorized exception will be risen.
+
+    In addition, you should note that the parameters will be checked and an
+    exception (ValidationError) will be risen if some of these parameters are
+    invalid.
+
+    :param id: The ID of the data request to be updated
+    :type id: string
+
+    :param title: The title of the data request
+    :type title: string
+
+    :param description: A brief description for your data request
+    :type description: string
+
+    :param organiztion_id: The ID of the organization you want to asign the
+        data request.
+    :type organization_id: string
+
+    :returns: A dict with the data request (id, user_id, title, description,
+        organization_id, open_time, accepted_dataset, close_time, closed)
+    :rtype: dict
+    '''
+
+    model = context['model']
+    session = context['session']
+    datarequest_id = data_dict.get('id', '')
+
+    if not datarequest_id:
+        raise tk.ValidationError(tk._('Data Request ID has not been included'))
+
+    # Init the data base
+    db.init_db(model)
+
+    # Check access
+    tk.check_access(constants.DATAREQUEST_UPDATE, context, data_dict)
+
+    # Get the initial data
+    result = db.DataRequest.get(id=datarequest_id)
+    if not result:
+        raise tk.ObjectNotFound(tk._('Data Request %s not found in the data base') % datarequest_id)
+
+    data_req = result[0]
+
+    # Avoid the validator to return an error when the user does not change the title
+    context['avoid_existing_title_check'] = data_req.title == data_dict['title']
+
+    # Validate data
+    validator.validate_datarequest(context, data_dict)
+
+    # Set the data provided by the user in the data_red
+    _undictize_datarequest_basic(data_req, data_dict)
+
+    session.add(data_req)
+    session.commit()
+
+    return _dictize_datarequest(data_req)
 
 
 def send_slack_message(slack_data):

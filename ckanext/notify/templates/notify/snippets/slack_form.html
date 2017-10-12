@@ -8,6 +8,8 @@ then itself be extended to add/remove blocks of functionality. #}
 
 <form class="form-horizontal channels" action="" method="post">
 
+  <input type="hidden" id="organization_id" name="organization_id" value="{{ data.get('organization_id', '') }}" />
+
   {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
 
   {% block webhook %}
