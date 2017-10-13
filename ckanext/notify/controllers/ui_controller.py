@@ -100,7 +100,23 @@ class DataRequestsNotifyUI(base.BaseController):
             return toolkit.render('notify/register_slack.html', extra_vars=required_vars)
         except toolkit.ObjectNotFound as e:
             log.warning(e)
-            toolkit.abort(404, toolkit._('Slack detail %s not found') % id)
+            toolkit.abort(404, toolkit._('Slack detail {0} not found'.format(id)))
         except toolkit.NotAuthorized as e:
             log.warning(e)
-            toolkit.abort(403, toolkit._('You are not authorized to update the slack detail %s' % id))
+            toolkit.abort(403, toolkit._('You are not authorized to update the channel {0}'.format(id)))
+
+    def delete_slack_details(self, id, organization_id):
+        data_dict = {'id': id, 'organization_id': organization_id}
+        context = self._get_context()
+
+        try:
+            toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+            toolkit.get_action(constants.SLACK_CHANNEL_DELETE)(context, data_dict)
+            helpers.flash_notice(toolkit._('A slack notification channel has been deleted'))
+            toolkit.redirect_to('organization_channels', id=organization_id)
+        except toolkit.ObjectNotFound as e:
+            log.warning(e)
+            toolkit.abort(404, toolkit._('Slack detail {0} not found'.format(id)))
+        except toolkit.NotAuthorized as e:
+            log.warning(e)
+            toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))

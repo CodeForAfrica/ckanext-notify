@@ -40,7 +40,7 @@ def _undictize_slack_basic(slack_details, data_dict):
 
 def datarequest_register_slack(context, data_dict):
     '''
-    Action to register the slack webhook and channel name. The function checks the access rights
+    Action to register a slack channel. The function checks the access rights
     of the user before creating the slack channel. If the user is not allowed
     a NotAuthorized exception will be risen.
 
@@ -51,13 +51,13 @@ def datarequest_register_slack(context, data_dict):
     :param context: the context of the request
     :type data_dict: dict
 
-    :param data_dict: contains the slack details to be registered
-    webhook: The webhook_url of the slack organization
-    channel: The channel via which notifications are to be received
+    :param data_dict: Contains the following:
+    webhook_url: The webhook_url of the slack organization
+    slack_channel: The slack_channel via which notifications are to be received
     organization_id: The ID of the organization
     :type data_dict: dict
 
-    :returns: A dict with the slack detaisl (id, webhook_url, channel
+    :returns: A dict with the slack details (id, webhook_url, channel
         organization_id)
     :rtype: dict
     '''
@@ -87,14 +87,18 @@ def datarequest_register_slack(context, data_dict):
 def slack_channels_show(context, data_dict):
     '''
     Action to retrieve the slack notification channels. The only required
-    parameter is the name of the organization passed as id. A NotFound exception will be
-    risen if the given id is not found.
+    parameter is the name of the organization passed as id. A NotFound
+    exception will be risen if the organization id is not found.
 
     Access rights will be checked before returning the information and an
     exception will be risen (NotAuthorized) if the user is not authorized.
 
-    :param id: The id of the organization to be shown
-    :type id: string
+    :param context: the context of the request
+    :type data_dict: dict
+
+    :param data_dict: Contains the following
+    organization_id: The ID of the organization
+    :type data_dict: dict
 
     :returns: A list of the slack notification details(id,
         organization_id, webhook_url, slack_channel)
@@ -113,12 +117,12 @@ def slack_channels_show(context, data_dict):
     # Check access
     tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
 
-    # Get the data request
+    # Get the available slack channels
     result = db.Org_Slack_Details.get(organization_id=organization_id)
-    if not result:
-        raise tk.ObjectNotFound(tk._('Organization %s not found in the data base') % organization_id)
-
-    slack_channels = [_dictize_slack_details(channel) for channel in result]
+    if result:
+        slack_channels = [_dictize_slack_details(channel) for channel in result]
+    else:
+        slack_channels = {}
 
     return slack_channels
 
@@ -132,8 +136,12 @@ def slack_channel_show(context, data_dict):
     Access rights will be checked before returning the information and an
     exception will be risen (NotAuthorized) if the user is not authorized.
 
-    :param id: The id of the slack notification channel to be shown
-    :type id: string
+    :param context: the context of the request
+    :type data_dict: dict
+
+    :param data_dict: Contains the following
+    id: The id of the slack notification channel to be shown
+    :type data_dict: dict
 
     :returns: A dict with the data request (id, user_id, title, description,
         organization_id, open_time, accepted_dataset, close_time, closed)
@@ -155,7 +163,7 @@ def slack_channel_show(context, data_dict):
     # Get the data request
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel %s not found in the data base') % id)
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the data base'.format(id)))
 
     slack_data = result[0]
     data_dict = _dictize_slack_details(slack_data)
@@ -165,25 +173,24 @@ def slack_channel_show(context, data_dict):
 
 def slack_channel_update(context, data_dict):
     '''
-    Action to update a slack channel. The function checks the access rights of
-    the user before updating the slack channel. If the user is not allowed
-    a NotAuthorized exception will be risen.
+    Action to update a slack channel. The only required parameter is the id
+    of the channel. The function checks the access rights of the user before
+    updating the slack channel. If the user is not allowed a NotAuthorized
+    exception will be risen.
 
     In addition, you should note that the parameters will be checked and an
     exception (ValidationError) will be risen if some of these parameters are
     invalid.
 
-    :param id: The ID of the slack channel to be updated
-    :type id: string
+    :param context: the context of the request
+    :type data_dict: dict
 
-    :param webhook_url: The webhook of the channel
-    :type webhook_url: string
-
-    :param slack_channel: The slack_channel of the channel
-    :type slack_channel: string
-
-    :param organization_id: The ID of the organization whose channel is to be updated
-    :type organization_id: string
+    :param data_dict: Contains the following:
+    id: The ID of the slack channel to be updated
+    webhook_url: The webhook_url of the slack organization
+    slack_channel: The slack_channel
+    organization_id: The ID of the organization whose channel is to be updated
+    :type data_dict: dict
 
     :returns: A dict with the data request (id, webhook_url, slack_channel,
         organization_id)
@@ -206,7 +213,7 @@ def slack_channel_update(context, data_dict):
     # Get the initial data
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Slack channel %s not found in the data base') % id)
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
     slack_details = result[0]
 
     # Avoid the validator to return an error when the user does not change the title
@@ -222,6 +229,44 @@ def slack_channel_update(context, data_dict):
     session.commit()
 
     return _dictize_slack_details(slack_details)
+
+
+def slack_channel_delete(context, data_dict):
+    '''
+    Action to delete a slack channel. The function checks the access rights
+    of the user before deleting the data request. If the user is not allowed
+    a NotAuthorized exception will be risen.
+
+    :param context: the context of the request
+    :type data_dict: dict
+
+    :param data_dict: Contains the following
+    id: The id of the slack notification channel to delete
+    :type data_dict: dict
+    '''
+
+    model = context['model']
+    session = context['session']
+    id = data_dict.get('id', '')
+
+    # Check id
+    if not id:
+        raise tk.ValidationError(tk._('Slack Channel ID has not been included'))
+
+    # Init the data base
+    db.init_db(model)
+
+    # Check access
+    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+
+    # Get the slack channel
+    result = db.Org_Slack_Details.get(id=id)
+    if not result:
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
+
+    slack_details = result[0]
+    session.delete(slack_details)
+    session.commit()
 
 
 def send_slack_message(slack_data):

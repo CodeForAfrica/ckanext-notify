@@ -28,6 +28,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
             constants.SLACK_CHANNELS_SHOW: actions.slack_channels_show,
             constants.SLACK_CHANNEL_SHOW: actions.slack_channel_show,
             constants.SLACK_CHANNEL_UPDATE: actions.slack_channel_update,
+            constants.SLACK_CHANNEL_DELETE: actions.slack_channel_delete,
             constants.DATAREQUEST_SEND_EMAIL_NOTIFICATION: actions.datarequest_email_notification,
             constants.DATAREQUEST_SEND_SLACK_NOTIFICATION: actions.datarequest_send_slack_notification,
         }
@@ -61,5 +62,10 @@ class NotifyPlugin(plugins.SingletonPlugin):
         map.connect('update_slack_form', '/organization/channels/slack/edit/{id}/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='update_slack_details', conditions=dict(method=['GET', 'POST']))
+
+        # Delete Slack Channel
+        map.connect('delete_slack_form', '/organization/channels/slack/delete/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='delete_slack_details', conditions=dict(method=['POST']))
 
         return map

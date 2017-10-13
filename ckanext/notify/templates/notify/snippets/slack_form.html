@@ -20,6 +20,9 @@ then itself be extended to add/remove blocks of functionality. #}
     {{ form.input("slack_channel", id="field-channel", label=_("Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
   {% endblock %}
 
+  <i class="icon-question-sign" style=" position: absolute; left: 95%; bottom: 37%;" title="This is where the entire explanation will fall and we can tell the use to do so sos sos sos sos"></i>
+  <i class="icon-question-sign" style=" position: absolute; left: 61%; bottom: 25%;"></i>
+
   <div class="form-actions">
     {% block form_actions %}
     <button class="btn btn-primary" type="submit" name="save">{{ _("Get Notifications") }}</button>
