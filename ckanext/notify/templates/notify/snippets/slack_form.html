@@ -2,6 +2,8 @@
 
 {% set webhook_url = data.get('webhook_url', '') %}
 {% set slack_channel = data.get('slack_channel', '') %}
+{% set webhook_title = 'Paste the Webhook URL you copied from the link above after adding the incoming webhooks integration. Ensure you select your preferred Slack channel to post messages to.' %}
+{% set channel_title = 'Enter the Slack channel you want to post messages to. Ensure you have selected this channel when adding incoming webhooks integration. ' %}
 
 {# This renders a form for an organization to register their slack details. It can
 then itself be extended to add/remove blocks of functionality. #}
@@ -17,11 +19,11 @@ then itself be extended to add/remove blocks of functionality. #}
   {% endblock %}
 
   {% block channel %}
-    {{ form.input("slack_channel", id="field-channel", label=_("Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
+    {{ form.input("slack_channel", id="field-channel", label=_("Slack Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
   {% endblock %}
 
-  <i class="icon-question-sign" style=" position: absolute; left: 95%; bottom: 37%;" title="This is where the entire explanation will fall and we can tell the use to do so sos sos sos sos"></i>
-  <i class="icon-question-sign" style=" position: absolute; left: 61%; bottom: 25%;"></i>
+  <i class="icon-question-sign" style=" position: absolute; left: 95%; bottom: 37%;" title="{{webhook_title}}"></i>
+  <i class="icon-question-sign" style=" position: absolute; left: 61%; bottom: 25%;" title="{{channel_title}}"></i>
 
   <div class="form-actions">
     {% block form_actions %}

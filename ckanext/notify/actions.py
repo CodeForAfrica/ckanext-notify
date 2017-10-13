@@ -163,7 +163,7 @@ def slack_channel_show(context, data_dict):
     # Get the data request
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the data base'.format(id)))
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the data base').format(id))
 
     slack_data = result[0]
     data_dict = _dictize_slack_details(slack_data)
@@ -213,7 +213,7 @@ def slack_channel_update(context, data_dict):
     # Get the initial data
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database').format(id))
     slack_details = result[0]
 
     # Avoid the validator to return an error when the user does not change the title
@@ -262,7 +262,7 @@ def slack_channel_delete(context, data_dict):
     # Get the slack channel
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
+        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database').format(id))
 
     slack_details = result[0]
     session.delete(slack_details)

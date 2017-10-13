@@ -7,5 +7,5 @@ SLACK_CHANNELS_SHOW = 'slack_channels_show'
 SLACK_CHANNEL_SHOW = 'slack_channel_show'
 SLACK_CHANNEL_UPDATE = 'slack_channel_update'
 SLACK_CHANNEL_DELETE = 'slack_channel_delete'
-WEBHOOK_MAX_LENGTH = 100
+WEBHOOK_MAX_LENGTH = 80
 CHANNEL_MAX_LENGTH = 21
