@@ -5,6 +5,7 @@ import re
 
 _space_or_period = re.compile(r'\.|\s|#')
 _slack_webhook = re.compile(r'^https://hooks\.slack\.com/services/T\w+/B\w+/\w+')
+_email_format = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 
 
 def validate_slack_form(context, request_data):
@@ -40,5 +41,14 @@ def validate_slack_form(context, request_data):
 def validate_email_form(context, request_data):
     errors = {}
 
-    if len(request_data['email']) is 0:
+    if not request_data['email']:
         errors[toolkit._('Email')] = [toolkit._('Email cannot be empty')]
+
+    if not _email_format.match(request_data['email']):
+        errors[toolkit._('Email')] = [toolkit._('Incorrect email format')]
+
+    if not request_data['email']:
+        errors[toolkit._('Email')] = [toolkit._('Email cannot be empty')]
+
+    if len(errors) > 0:
+        raise toolkit.ValidationError(errors)
