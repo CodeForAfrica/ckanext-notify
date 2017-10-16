@@ -33,6 +33,11 @@ class DataRequestsNotifyUI(base.BaseController):
         slack_channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, {'organization_id': id})
         return toolkit.render('notify/channels.html', extra_vars={'channels': slack_channels})
 
+    def add_channel(self, id):
+        context = self._get_context()
+        c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
+        return toolkit.render('notify/add_channel.html')
+
     def slack_form(self, organization_id):
         context = self._get_context()
 
@@ -42,13 +47,15 @@ class DataRequestsNotifyUI(base.BaseController):
         }
         c.errors = {}
         c.errors_summary = {}
+        new_form = True
 
         try:
             toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, {'organization_id': organization_id})
             self.post_slack_form(constants.DATAREQUEST_REGISTER_SLACK, context)
 
             c.group_dict = toolkit.get_action('organization_show')(context, {'id': organization_id})
-            required_vars = {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
+            required_vars = \
+                {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary, 'new_form': new_form}
             return toolkit.render('notify/register_slack.html', extra_vars=required_vars)
 
         except toolkit.NotAuthorized as e:
@@ -67,7 +74,11 @@ class DataRequestsNotifyUI(base.BaseController):
 
             try:
                 toolkit.get_action(action)(context, data_dict)
-                helpers.flash_success(toolkit._('You have successfully added your slack notification channel'))
+                if action == constants.DATAREQUEST_REGISTER_SLACK:
+                    helpers.flash_success(toolkit._('You have successfully added a slack notification channel'))
+                else:
+                    helpers.flash_success(toolkit._('You have successfully updated a slack notification channel'))
+
                 toolkit.redirect_to('organization_channels', id=data_dict['organization_id'])
             except toolkit.ValidationError as e:
                 log.warning(e)
@@ -88,6 +99,7 @@ class DataRequestsNotifyUI(base.BaseController):
         c.slack_data = {}
         c.errors = {}
         c.errors_summary = {}
+        new_form = False
 
         try:
             toolkit.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
@@ -96,7 +108,8 @@ class DataRequestsNotifyUI(base.BaseController):
             self.post_slack_form(constants.SLACK_CHANNEL_UPDATE, context, id=id)
 
             c.group_dict = toolkit.get_action('organization_show')(context, {'id': organization_id})
-            required_vars = {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
+            required_vars = \
+                {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary, 'new_form': new_form}
             return toolkit.render('notify/register_slack.html', extra_vars=required_vars)
         except toolkit.ObjectNotFound as e:
             log.warning(e)

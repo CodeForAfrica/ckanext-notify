@@ -49,7 +49,7 @@ def datarequest_register_slack(context, data_dict):
     not valid.
 
     :param context: the context of the request
-    :type data_dict: dict
+    :type context: dict
 
     :param data_dict: Contains the following:
     webhook_url: The webhook_url of the slack organization
@@ -94,7 +94,7 @@ def slack_channels_show(context, data_dict):
     exception will be risen (NotAuthorized) if the user is not authorized.
 
     :param context: the context of the request
-    :type data_dict: dict
+    :type context: dict
 
     :param data_dict: Contains the following
     organization_id: The ID of the organization
@@ -137,7 +137,7 @@ def slack_channel_show(context, data_dict):
     exception will be risen (NotAuthorized) if the user is not authorized.
 
     :param context: the context of the request
-    :type data_dict: dict
+    :type context: dict
 
     :param data_dict: Contains the following
     id: The id of the slack notification channel to be shown
@@ -215,9 +215,6 @@ def slack_channel_update(context, data_dict):
     if not result:
         raise tk.ObjectNotFound(tk._('Channel {0} not found in the database').format(id))
     slack_details = result[0]
-
-    # Avoid the validator to return an error when the user does not change the title
-    # context['avoid_existing_title_check'] = data_req.title == data_dict['title']
 
     # Validate data
     validator.validate_slack_form(context, data_dict)
