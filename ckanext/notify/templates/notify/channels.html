@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for channel in channels %}
+        {% for channel in slack_channels %}
           <tr>
             <td>
               {{ channel.webhook_url }}
@@ -61,8 +61,7 @@
     <h3>Email</h3>
     <table class="table table-header table-hover table-bordered">
       <col width="70%" />
-      <col width="18%" />
-      <col width="12%" />
+      <col width="30%" />
       <thead>
         <tr>
           <th scope="col">{{ _('Email') }}</th>
@@ -70,7 +69,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for channel in channels %}
+        {% for channel in email_channels %}
           <tr>
             <td>
               To: {{ channel.email }}
@@ -79,7 +78,7 @@
               {% set locale = h.dump_json({'content': _('Are you sure you want to delete this channel?')}) %}
               <div class="btn-group pull-right">
                 <a class="btn btn-small" href="{{ h.url_for('update_email_form', id=channel.id, organization_id=channel.organization_id) }}" title="{{ _('Edit') }}">
-                  <i class="icon-wrench"></i>
+                  
                 </a>
                 <a class="btn btn-danger btn-small" href="{{ h.url_for('delete_email_form', id=channel.id, organization_id=channel.organization_id) }}" data-module="confirm-action" data-module-i18n="{{ locale }}" title="{{ _('Delete') }}">
                   {% block delete_button_text %}
@@ -95,5 +94,3 @@
   {% endif %}
   </div>
 {% endblock %}
-
-

@@ -80,7 +80,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
                     action='delete_slack_details', conditions=dict(method=['POST']))
 
         # Organization email registration
-        map.connect('email_form', '/organization/channels/email/{id}',
+        map.connect('email_form', '/organization/channels/email/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='email_form', conditions=dict(method=['GET', 'POST']))
 

@@ -257,7 +257,7 @@ def _dictize_email_details(email_details):
 
 def _undictize_email_basic(email_details, data_dict):
     email_details.email = data_dict['email']
-    email_details.organization_id = data_dict['id']
+    email_details.organization_id = data_dict['organization_id']
 
 
 def datarequest_register_email(context, data_dict):
@@ -459,7 +459,7 @@ def email_channel_delete(context, data_dict):
 
     # Check id
     if not id:
-        raise tk.ValidationError(tk._('Slack Channel ID has not been included'))
+        raise tk.ValidationError(tk._('Email Channel ID has not been included'))
 
     # Init the data base
     db.init_db(model)
