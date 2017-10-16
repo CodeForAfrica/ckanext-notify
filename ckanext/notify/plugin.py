@@ -26,6 +26,10 @@ class NotifyPlugin(plugins.SingletonPlugin):
         additional_actions = {
             constants.DATAREQUEST_REGISTER_SLACK: actions.datarequest_register_slack,
             constants.DATAREQUEST_REGISTER_EMAIL: actions.datarequest_register_email,
+            constants.EMAIL_CHANNELS_SHOW: actions.email_channels_show,
+            constants.EMAIL_CHANNEL_SHOW: actions.email_channel_show,
+            constants.EMAIL_CHANNEL_UPDATE: actions.email_channel_update,
+            constants.EMAIL_CHANNEL_DELETE: actions.email_channel_delete,
             constants.DATAREQUEST_SEND_EMAIL_NOTIFICATION: actions.datarequest_email_notification,
             constants.DATAREQUEST_SEND_SLACK_NOTIFICATION: actions.datarequest_send_slack_notification,
         }
@@ -60,5 +64,15 @@ class NotifyPlugin(plugins.SingletonPlugin):
         map.connect('email_form', '/organization/channels/email/{id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='email_form', conditions=dict(method=['GET', 'POST']))
+
+        # Update Email Channel
+        map.connect('update_email_form', '/organization/channels/email/edit/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='update_email_details', conditions=dict(method=['GET', 'POST']))
+
+        # Delete Email Channel
+        map.connect('delete_email_form', '/organization/channels/email/delete/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='delete_email_details', conditions=dict(method=['POST']))
 
         return map
