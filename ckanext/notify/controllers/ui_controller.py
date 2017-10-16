@@ -30,7 +30,8 @@ class DataRequestsNotifyUI(base.BaseController):
     def organization_channels(self, id):
         context = self._get_context()
         c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
-        return toolkit.render('notify/channels.html')
+        email_channels = toolkit.get_action(constants.EMAIL_CHANNELS_SHOW)(context, {'organization_id': id})
+        return toolkit.render('notify/channels.html', extra_vars={'channels': email_channels})
 
     def slack_form(self, id):
         context = self._get_context()
@@ -108,9 +109,50 @@ class DataRequestsNotifyUI(base.BaseController):
             except toolkit.ValidationError as e:
                 log.warning(e)
                 # Fill the fields that will display some information in the page
-                c.slack_data = {
+                c.email_data = {
                     'id': data_dict.get('id', ''),
                     'email': data_dict.get('email', '')
                 }
                 c.errors = e.error_dict
                 c.errors_summary = _get_errors_summary(c.errors)
+
+    def update_email_details(self, id, organization_id):
+        data_dict = {'id': id, 'organization_id': organization_id}
+        context = self._get_context()
+
+        # Basic initialization
+        c.email_data = {}
+        c.errors = {}
+        c.errors_summary = {}
+
+        try:
+            toolkit.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+            c.slack_data = toolkit.get_action(constants.EMAIL_CHANNEL_SHOW)(context, data_dict)
+
+            self.post_slack_form(constants.EMAIL_CHANNEL_UPDATE, context, id=id)
+
+            c.group_dict = toolkit.get_action('organization_show')(context, {'id': organization_id})
+            required_vars = {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
+            return toolkit.render('notify/register_email.html', extra_vars=required_vars)
+        except toolkit.ObjectNotFound as e:
+            log.warning(e)
+            toolkit.abort(404, toolkit._('Email detail {0} not found'.format(id)))
+        except toolkit.NotAuthorized as e:
+            log.warning(e)
+            toolkit.abort(403, toolkit._('You are not authorized to update the channel {0}'.format(id)))
+
+    def delete_email_details(self, id, organization_id):
+        data_dict = {'id': id, 'organization_id': organization_id}
+        context = self._get_context()
+
+        try:
+            toolkit.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+            toolkit.get_action(constants.EMAIL_CHANNEL_DELETE)(context, data_dict)
+            helpers.flash_notice(toolkit._('An email notification channel has been deleted'))
+            toolkit.redirect_to('organization_channels', id=organization_id)
+        except toolkit.ObjectNotFound as e:
+            log.warning(e)
+            toolkit.abort(404, toolkit._('Email detail {0} not found'.format(id)))
+        except toolkit.NotAuthorized as e:
+            log.warning(e)
+            toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))
