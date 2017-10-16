@@ -88,7 +88,7 @@ class DataRequestsNotifyUI(base.BaseController):
             self.post_email_form(id, constants.DATAREQUEST_REGISTER_EMAIL, context)
 
             c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
-            required_vars = {'data': c.email_data, 'errors': c.errors, 'error_summary': c.errors_summary}
+            required_vars = {'data': c.email_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
             return toolkit.render('notify/register_email.html', extra_vars=required_vars)
 
         except toolkit.NotAuthorized as e:
