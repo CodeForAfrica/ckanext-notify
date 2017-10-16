@@ -1,6 +1,5 @@
 import constants
 import ckan.plugins.toolkit as toolkit
-import ckanext.datarequests.db as db
 import re
 
 _space_or_period = re.compile(r'\.|\s|#')
