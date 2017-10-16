@@ -22,7 +22,7 @@
             <small>Notifications are sent to a channel in your organization</small>
           </span>
         </div>
-        <a href="{{ h.url_for('slack_form', id=c.group_dict.name) }}" class="btn btn-success">Add Channel</a>
+        <a href="{{ h.url_for('slack_form', organization_id=c.group_dict.name) }}" class="btn btn-success">Add Channel</a>
       </section>
       <section class="channel">
         <div class="channel-details">
@@ -32,7 +32,7 @@
             <small>Notifications are sent to an email address you provide</small>
           </span>
         </div>
-        <a href="{{ h.url_for('email_form', id=c.group_dict.name) }}" class="btn btn-success">Add Channel</a>
+        <a href="{{ h.url_for('email_form', organization_id=c.group_dict.name) }}" class="btn btn-success">Add Channel</a>
       </section>
     </div>
   </div>
@@ -43,8 +43,7 @@
     <h3>Email</h3>
     <table class="table table-header table-hover table-bordered">
       <col width="70%" />
-      <col width="18%" />
-      <col width="12%" />
+      <col width="30%" />
       <thead>
         <tr>
           <th scope="col">{{ _('Email') }}</th>
@@ -61,7 +60,7 @@
               {% set locale = h.dump_json({'content': _('Are you sure you want to delete this channel?')}) %}
               <div class="btn-group pull-right">
                 <a class="btn btn-small" href="{{ h.url_for('update_email_form', id=channel.id, organization_id=channel.organization_id) }}" title="{{ _('Edit') }}">
-                  <i class="icon-wrench"></i>
+                  
                 </a>
                 <a class="btn btn-danger btn-small" href="{{ h.url_for('delete_email_form', id=channel.id, organization_id=channel.organization_id) }}" data-module="confirm-action" data-module-i18n="{{ locale }}" title="{{ _('Delete') }}">
                   {% block delete_button_text %}

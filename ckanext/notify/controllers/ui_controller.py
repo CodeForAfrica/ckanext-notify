@@ -75,20 +75,22 @@ class DataRequestsNotifyUI(base.BaseController):
                 c.errors = e.error_dict
                 c.errors_summary = _get_errors_summary(c.errors)
 
-    def email_form(self, id):
+    def email_form(self, organization_id):
         context = self._get_context()
 
         # Basic initialization
-        c.email_data = {}
+        c.email_data = {
+            'organization_id': organization_id
+        }
         c.errors = {}
         c.errors_summary = {}
 
         # Check access
         try:
             # toolkit.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, {'org_id': id})
-            self.post_email_form(id, constants.DATAREQUEST_REGISTER_EMAIL, context)
+            self.post_email_form(constants.DATAREQUEST_REGISTER_EMAIL, context)
 
-            c.group_dict = toolkit.get_action('organization_show')(context, {'id': id})
+            c.group_dict = toolkit.get_action('organization_show')(context, {'id': organization_id})
             required_vars = {'data': c.email_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
             return toolkit.render('notify/register_email.html', extra_vars=required_vars)
 
@@ -96,21 +98,25 @@ class DataRequestsNotifyUI(base.BaseController):
             log.warning(e)
             toolkit.abort(403, toolkit._('Unauthorized to register email details for this organization'))
 
-    def post_email_form(self, id, action, context):
+    def post_email_form(self, action, context, **kwargs):
         if request.POST:
             data_dict = dict()
             data_dict['email'] = request.POST.get('email', '')
-            data_dict['id'] = id
+            data_dict['organization_id'] = request.POST.get('organization_id', '')
+
+            if action == constants.EMAIL_CHANNEL_UPDATE:
+                data_dict['id'] = kwargs['id']
 
             try:
+                print("ID: ", data_dict['organization_id'])
                 toolkit.get_action(action)(context, data_dict)
                 helpers.flash_success(toolkit._('You have successfully added your email notification channel'))
-                toolkit.redirect_to('organization_channels', id=id)
+                toolkit.redirect_to('organization_channels', id=data_dict['organization_id'])
             except toolkit.ValidationError as e:
                 log.warning(e)
                 # Fill the fields that will display some information in the page
                 c.email_data = {
-                    'id': data_dict.get('id', ''),
+                    'organization_id': data_dict.get('organization_id', ''),
                     'email': data_dict.get('email', '')
                 }
                 c.errors = e.error_dict
@@ -127,12 +133,12 @@ class DataRequestsNotifyUI(base.BaseController):
 
         try:
             toolkit.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
-            c.slack_data = toolkit.get_action(constants.EMAIL_CHANNEL_SHOW)(context, data_dict)
+            c.email_data = toolkit.get_action(constants.EMAIL_CHANNEL_SHOW)(context, data_dict)
 
-            self.post_slack_form(constants.EMAIL_CHANNEL_UPDATE, context, id=id)
+            self.post_email_form(constants.EMAIL_CHANNEL_UPDATE, context, id=id)
 
             c.group_dict = toolkit.get_action('organization_show')(context, {'id': organization_id})
-            required_vars = {'data': c.slack_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
+            required_vars = {'data': c.email_data, 'errors': c.errors, 'errors_summary': c.errors_summary}
             return toolkit.render('notify/register_email.html', extra_vars=required_vars)
         except toolkit.ObjectNotFound as e:
             log.warning(e)

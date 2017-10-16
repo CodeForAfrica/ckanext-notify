@@ -56,12 +56,12 @@ class NotifyPlugin(plugins.SingletonPlugin):
                     action='organization_channels', conditions=dict(method=['GET']), ckan_icon='bell')
 
         # Slack channel registration
-        map.connect('slack_form', '/organization/channels/slack/{id}',
+        map.connect('slack_form', '/organization/channels/slack/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='slack_form', conditions=dict(method=['GET', 'POST']))
 
         # Organization email registration
-        map.connect('email_form', '/organization/channels/email/{id}',
+        map.connect('email_form', '/organization/channels/email/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='email_form', conditions=dict(method=['GET', 'POST']))
 
