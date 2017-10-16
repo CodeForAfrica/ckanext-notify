@@ -16,7 +16,13 @@ then itself be extended to add/remove blocks of functionality. #}
 
   <div class="form-actions">
     {% block form_actions %}
-    <button class="btn btn-primary" type="submit" name="save">{{ _("Get Notifications") }}</button>
+    <button class="btn btn-primary" type="submit" name="save">
+      {% if new_form %}
+      {{ _("Get Notifications") }}
+      {% else %}
+      {{ _("Update Notification Channel") }}
+      {% endif %}
+    </button>
     {% endblock %}
   </div>
 

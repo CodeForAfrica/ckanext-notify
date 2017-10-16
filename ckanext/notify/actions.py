@@ -5,7 +5,6 @@ import ckan.plugins as plugins
 import ckan.lib.mailer as mailer
 import constants
 import validator
-import datetime
 import json
 import requests
 import db
@@ -14,8 +13,8 @@ import db
 from ckan.common import _, config
 from socket import error as socket_error
 
-tk = plugins.toolkit
-c = tk.c
+toolkit = plugins.toolkit
+c = toolkit.c
 
 ValidationError = logic.ValidationError
 
@@ -37,6 +36,23 @@ def _undictize_slack_basic(slack_details, data_dict):
     slack_details.webhook_url = data_dict['webhook_url']
     slack_details.slack_channel = data_dict['slack_channel']
     slack_details.organization_id = data_dict['organization_id']
+
+
+def _dictize_email_details(email_details):
+
+    # Convert the slack details into a dict
+    data_dict = {
+        'id': email_details.id,
+        'email': email_details.email,
+        'organization_id': email_details.organization_id
+    }
+
+    return data_dict
+
+
+def _undictize_email_basic(email_details, data_dict):
+    email_details.email = data_dict['email']
+    email_details.organization_id = data_dict['organization_id']
 
 
 def datarequest_register_slack(context, data_dict):
@@ -70,7 +86,7 @@ def datarequest_register_slack(context, data_dict):
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Validate data
     validator.validate_slack_form(context, data_dict)
@@ -110,13 +126,13 @@ def slack_channels_show(context, data_dict):
     organization_id = data_dict.get('organization_id', '')
 
     if not organization_id:
-        raise tk.ValidationError(tk._('Organization ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Organization ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the available slack channels
     result = db.Org_Slack_Details.get(organization_id=organization_id)
@@ -153,18 +169,18 @@ def slack_channel_show(context, data_dict):
     id = data_dict.get('id', '')
 
     if not id:
-        raise tk.ValidationError(tk._('Channel ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Channel ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the data request
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the data base').format(id))
+        raise toolkit.ObjectNotFound(toolkit._('Channel {0} not found in the data base').format(id))
 
     slack_data = result[0]
     data_dict = _dictize_slack_details(slack_data)
@@ -203,18 +219,18 @@ def slack_channel_update(context, data_dict):
     id = data_dict.get('id', '')
 
     if not id:
-        raise tk.ValidationError(tk._('Slack Channel ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Slack Channel ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the initial data
     result = db.Org_Slack_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database').format(id))
+        raise toolkit.ObjectNotFound(toolkit._('Channel {0} not found in the database').format(id))
     slack_details = result[0]
 
     # Validate data
@@ -229,7 +245,6 @@ def slack_channel_update(context, data_dict):
     return _dictize_slack_details(slack_details)
 
 
-
 def slack_channel_delete(context, data_dict):
     '''
     Action to delete a slack channel. The function checks the access rights
@@ -242,22 +257,30 @@ def slack_channel_delete(context, data_dict):
     :param data_dict: Contains the following
     id: The id of the slack notification channel to delete
     :type data_dict: dict
+    '''
 
-def _dictize_email_details(email_details):
+    model = context['model']
+    session = context['session']
+    id = data_dict.get('id', '')
 
-    # Convert the slack details into a dict
-    data_dict = {
-        'id': email_details.id,
-        'email': email_details.email,
-        'organization_id': email_details.organization_id
-    }
+    # Check id
+    if not id:
+        raise toolkit.ValidationError(toolkit._('Slack Channel ID has not been included'))
 
-    return data_dict
+    # Init the data base
+    db.init_db(model)
 
+    # Check access
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
-def _undictize_email_basic(email_details, data_dict):
-    email_details.email = data_dict['email']
-    email_details.organization_id = data_dict['organization_id']
+    # Get the slack channel
+    result = db.Org_Slack_Details.get(id=id)
+    if not result:
+        raise toolkit.ObjectNotFound(toolkit._('Channel {0} not found in the database').format(id))
+
+    slack_details = result[0]
+    session.delete(slack_details)
+    session.commit()
 
 
 def datarequest_register_email(context, data_dict):
@@ -292,7 +315,7 @@ def datarequest_register_email(context, data_dict):
     db.init_db(model)
 
     # Check access
-    # tk.check_access(constants.DATAREQUEST_REGISTER_SLACK, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Validate data
     validator.validate_email_form(context, data_dict)
@@ -314,11 +337,14 @@ def email_channel_show(context, data_dict):
     exception will be risen if the given id is not found.
     Access rights will be checked before returning the information and an
     exception will be risen (NotAuthorized) if the user is not authorized.
+
     :param context: the context of the request
     :type data_dict: dict
+
     :param data_dict: Contains the following
     id: The id of the email notification channel to be shown
     :type data_dict: dict
+
     :returns: A dict with the data request (id, user_id, title, description,
         organization_id, open_time, accepted_dataset, close_time, closed)
     :rtype: dict
@@ -328,18 +354,18 @@ def email_channel_show(context, data_dict):
     id = data_dict.get('id', '')
 
     if not id:
-        raise tk.ValidationError(tk._('Channel ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Email ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the data request
     result = db.Org_Email_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the data base'.format(id)))
+        raise toolkit.ObjectNotFound(toolkit._('Email {0} not found in the data base'.format(id)))
 
     email_data = result[0]
     data_dict = _dictize_email_details(email_data)
@@ -354,11 +380,14 @@ def email_channels_show(context, data_dict):
     exception will be risen if the organization id is not found.
     Access rights will be checked before returning the information and an
     exception will be risen (NotAuthorized) if the user is not authorized.
+
     :param context: the context of the request
     :type data_dict: dict
+
     :param data_dict: Contains the following
     organization_id: The ID of the organization
     :type data_dict: dict
+
     :returns: A list of the email notification details(id,
         organization_id, email)
     :rtype: list
@@ -368,13 +397,13 @@ def email_channels_show(context, data_dict):
     organization_id = data_dict.get('organization_id', '')
 
     if not organization_id:
-        raise tk.ValidationError(tk._('Organization ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Organization ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the available slack channels
     result = db.Org_Email_Details.get(organization_id=organization_id)
@@ -412,27 +441,24 @@ def email_channel_update(context, data_dict):
     id = data_dict.get('id', '')
 
     if not id:
-        raise tk.ValidationError(tk._('Email Notification Channel ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Email Notification ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the initial data
     result = db.Org_Email_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
+        raise toolkit.ObjectNotFound(toolkit._('Email {0} not found in the database'.format(id)))
     email_data = result[0]
-
-    # Avoid the validator to return an error when the user does not change the title
-    # context['avoid_existing_title_check'] = data_req.title == data_dict['title']
 
     # Validate data
     validator.validate_email_form(context, data_dict)
 
-    # Set the data provided by the user in the data_red
+    # Set the data provided by the user in the data_dict
     _undictize_email_basic(email_data, data_dict)
 
     session.add(email_data)
@@ -448,6 +474,7 @@ def email_channel_delete(context, data_dict):
     a NotAuthorized exception will be risen.
     :param context: the context of the request
     :type data_dict: dict
+
     :param data_dict: Contains the following
     id: The id of the slack notification channel to delete
     :type data_dict: dict
@@ -459,88 +486,19 @@ def email_channel_delete(context, data_dict):
 
     # Check id
     if not id:
-        raise tk.ValidationError(tk._('Email Channel ID has not been included'))
+        raise toolkit.ValidationError(toolkit._('Email ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    tk.check_access(constants.DATAREQUEST_REGISTER_EMAIL, context, data_dict)
+    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the slack channel
     result = db.Org_Email_Details.get(id=id)
     if not result:
-        raise tk.ObjectNotFound(tk._('Channel {0} not found in the database'.format(id)))
+        raise toolkit.ObjectNotFound(toolkit._('Email {0} not found in the database'.format(id)))
 
     email_data = result[0]
     session.delete(email_data)
     session.commit()
-
-
-def send_slack_message(slack_data):
-    response = requests.post(
-        config.get('slack.webhook_url'), data=json.dumps(slack_data),
-        headers={'Content-Type': 'application/json'}
-    )
-    if response.status_code != 200:
-        raise ValueError(
-            'Request to slack returned an error %s, the response is:\n%s'
-            % (response.status_code, response.text)
-        )
-
-
-def datarequest_email_notification(context, data_dict):
-    '''
-    Action to send email notification to organization members when a new
-    data request is created.
-
-    :param id: The id of the data request
-    :type id: string
-    :param title: The title of the data request
-    :type title: string
-    :param description: A brief description for your data request
-    :type description: string
-    :param organization_users: The organization members who will be notified when a data request
-    :type organization_users: dictionary
-    '''
-    try:
-        datarequest_url = config.get('ckan.site_url') + '/datarequest/' + data_dict['id']
-        users = data_dict['organization']['users']
-        extra_vars = {
-            'site_title': config.get('ckan.site_title'),
-            'site_url': config.get('ckan.site_url'),
-            'datarequest_title': data_dict['title'],
-            'datarequest_description': data_dict['description'],
-            'datarequest_url': datarequest_url,
-        }
-        subject = base.render_jinja2('emails/notify_user_subject.txt',
-                                     extra_vars)
-
-        for user in users:
-            # Retrieve user data
-            user_data = model.User.get(user['id'])
-            extra_vars['user_fullname'] = user_data.fullname
-            body = base.render_jinja2('emails/notify_user_body.txt',
-                                      extra_vars)
-            mailer.mail_user(user_data, subject, body)
-    except(socket_error, mailer.MailerException) as error:
-        # Email could not be sent
-        msg = _('Error sending the notification email, {0}').format(error)
-        raise ValidationError({'message': msg}, error_summary=msg)
-
-
-def datarequest_send_slack_notification(context, data_dict):
-    datarequest_url = config.get('ckan.site_url') + '/datarequest/' + data_dict['id']
-    extra_vars = {
-        'site_title': config.get('ckan.site_title'),
-        'site_url': config.get('ckan.site_url'),
-        'datarequest_title': data_dict['title'],
-        'datarequest_description': data_dict['description'],
-        'datarequest_url': datarequest_url,
-    }
-    slack_data = {'text': base.render_jinja2('slack/slack_notify_request_body.txt',
-                  extra_vars),
-                  'username': config.get('slack.username'),
-                  'channel': config.get('slack.channel')
-                  }
-    send_slack_message(slack_data)

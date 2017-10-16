@@ -29,7 +29,7 @@
             <small>{% trans %}Notifications are sent to an email address you provide{% endtrans %}</small>
           </span>
         </div>
-        <a href="{{ h.url_for('slack_form', organization_id=c.group_dict.name) }}" class="btn btn-success">
+        <a href="{{ h.url_for('email_form', organization_id=c.group_dict.name) }}" class="btn btn-success">
           {% trans %}Add Channel{% endtrans %}
         </a>
       </section>

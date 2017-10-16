@@ -34,8 +34,6 @@ class NotifyPlugin(plugins.SingletonPlugin):
             constants.EMAIL_CHANNEL_SHOW: actions.email_channel_show,
             constants.EMAIL_CHANNEL_UPDATE: actions.email_channel_update,
             constants.EMAIL_CHANNEL_DELETE: actions.email_channel_delete,
-            constants.DATAREQUEST_SEND_EMAIL_NOTIFICATION: actions.datarequest_email_notification,
-            constants.DATAREQUEST_SEND_SLACK_NOTIFICATION: actions.datarequest_send_slack_notification,
         }
 
         return additional_actions
@@ -44,8 +42,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
 
     def get_auth_functions(self):
         auth_functions = {
-            constants.DATAREQUEST_REGISTER_SLACK: auth.datarequest_register_slack,
-            constants.DATAREQUEST_REGISTER_EMAIL: auth.datarequest_register_email,
+            constants.MANAGE_NOTIFICATIONS: auth.manage_notifications,
         }
 
         return auth_functions
@@ -79,7 +76,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='delete_slack_details', conditions=dict(method=['POST']))
 
-        # Organization email registration
+        # Email channel registration
         map.connect('email_form', '/organization/channels/email/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='email_form', conditions=dict(method=['GET', 'POST']))
