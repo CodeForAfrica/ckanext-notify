@@ -1,0 +1,38 @@
+{% extends "notify/base.html" %}
+
+{% block subtitle %}{{ _('Add Channel') }} - {{ super() }}{% endblock %}
+
+{% block primary_content_inner %}
+  <div class="channel-page">
+    <div class="channel-page-header">
+      <h2 class="page-heading">{% trans %}Add A Notification Channel{% endtrans %}</h2>
+      <p>{% trans %}Select a channel via which you will be notified of datarequest activities that concerns your organization.{% endtrans %}</p>
+    </div>
+    <div class="channels">
+      <section class="channel">
+        <div class="channel-details">
+          <img src="{{ h.url_for_static('/base/images/slack.png') }}">
+          <span>
+            <h3>{{ _('Slack') }}</h3>
+            <small>{% trans %}Notifications are sent to a channel in your slack workspace{% endtrans %}</small>
+          </span>
+        </div>
+        <a href="{{ h.url_for('slack_form', organization_id=c.group_dict.name) }}" class="btn btn-success">
+          {% trans %}Add Channel{% endtrans %}
+        </a>
+      </section>
+      <section class="channel">
+        <div class="channel-details">
+          <img src="{{ h.url_for_static('/base/images/email.png') }}">
+          <span>
+            <h3>{{ _('Email') }}</h3>
+            <small>{% trans %}Notifications are sent to an email address you provide{% endtrans %}</small>
+          </span>
+        </div>
+        <a href="{{ h.url_for('email_form', organization_id=c.group_dict.name) }}" class="btn btn-success">
+          {% trans %}Add Channel{% endtrans %}
+        </a>
+      </section>
+    </div>
+  </div>
+{% endblock %}

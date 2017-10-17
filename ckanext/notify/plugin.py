@@ -25,13 +25,15 @@ class NotifyPlugin(plugins.SingletonPlugin):
     def get_actions(self):
         additional_actions = {
             constants.DATAREQUEST_REGISTER_SLACK: actions.datarequest_register_slack,
+            constants.SLACK_CHANNELS_SHOW: actions.slack_channels_show,
+            constants.SLACK_CHANNEL_SHOW: actions.slack_channel_show,
+            constants.SLACK_CHANNEL_UPDATE: actions.slack_channel_update,
+            constants.SLACK_CHANNEL_DELETE: actions.slack_channel_delete,
             constants.DATAREQUEST_REGISTER_EMAIL: actions.datarequest_register_email,
             constants.EMAIL_CHANNELS_SHOW: actions.email_channels_show,
             constants.EMAIL_CHANNEL_SHOW: actions.email_channel_show,
             constants.EMAIL_CHANNEL_UPDATE: actions.email_channel_update,
             constants.EMAIL_CHANNEL_DELETE: actions.email_channel_delete,
-            constants.DATAREQUEST_SEND_EMAIL_NOTIFICATION: actions.datarequest_email_notification,
-            constants.DATAREQUEST_SEND_SLACK_NOTIFICATION: actions.datarequest_send_slack_notification,
         }
 
         return additional_actions
@@ -40,8 +42,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
 
     def get_auth_functions(self):
         auth_functions = {
-            constants.DATAREQUEST_REGISTER_SLACK: auth.datarequest_register_slack,
-            constants.DATAREQUEST_REGISTER_EMAIL: auth.datarequest_register_email,
+            constants.MANAGE_NOTIFICATIONS: auth.manage_notifications,
         }
 
         return auth_functions
@@ -50,17 +51,32 @@ class NotifyPlugin(plugins.SingletonPlugin):
 
     def before_map(self, map):
 
-        # Channels that an organization can subscribe to be notified with
+        # Existing Channels
         map.connect('organization_channels', '/organization/channels/{id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='organization_channels', conditions=dict(method=['GET']), ckan_icon='bell')
+
+        # Add Channels
+        map.connect('add_channel', '/organization/channels/add/{id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='add_channel', conditions=dict(method=['GET']))
 
         # Slack channel registration
         map.connect('slack_form', '/organization/channels/slack/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='slack_form', conditions=dict(method=['GET', 'POST']))
 
-        # Organization email registration
+        # Update Slack Channel
+        map.connect('update_slack_form', '/organization/channels/slack/edit/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='update_slack_details', conditions=dict(method=['GET', 'POST']))
+
+        # Delete Slack Channel
+        map.connect('delete_slack_form', '/organization/channels/slack/delete/{id}/{organization_id}',
+                    controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
+                    action='delete_slack_details', conditions=dict(method=['POST']))
+
+        # Email channel registration
         map.connect('email_form', '/organization/channels/email/{organization_id}',
                     controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI',
                     action='email_form', conditions=dict(method=['GET', 'POST']))

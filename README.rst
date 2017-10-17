@@ -32,9 +32,7 @@
 ckanext-notify
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
+[EXPERIMENTAL] CKAN extension to provide more options for notifications such as Slack notifications.
 
 
 ------------
