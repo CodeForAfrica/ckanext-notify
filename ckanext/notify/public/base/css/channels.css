@@ -1,0 +1,28 @@
+.channels {
+    margin-top: 20px;
+}
+
+.channel {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px;
+}
+
+.channel-details span {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.channel-details h3 {
+    margin: 0;
+}
+
+.channel a {
+    max-height: 20px;
+    margin: 27px 15px 0 0;
+}
+
+.channel-details img {
+    width: 50px;
+    margin: 15px 5px 0 0;
+}

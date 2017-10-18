@@ -1,0 +1,27 @@
+{% extends "organization/edit_base.html" %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ h.url_for_static('/base/css/channels.css') }}" />
+{% endblock %}
+
+{% block subtitle %}{{ _('Channels') }} - {{ super() }}{% endblock %}
+
+{% block secondary_content %}
+
+  <section class="module module-narrow module-shallow">
+    <h2 class="module-heading"><i class="icon-info-sign"></i>{% trans %}Channels{% endtrans %}</h2>
+    <div class="module-content">
+      <p>
+        {% trans %}
+          With Channels, you can receive notifications when a user carries out an action that you should know about on
+          DataRequests. These could be after a datarequest (with your organization's name) is created , commented on,
+          or closed.
+        {% endtrans %}
+      </p>
+      {% block secondary_content_additional_info %}
+      {% endblock %}
+    </div>
+  </section>
+
+{% endblock %}

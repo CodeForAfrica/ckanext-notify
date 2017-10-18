@@ -1,0 +1,43 @@
+{% import "macros/form.html" as form %}
+
+{% set webhook_url = data.get('webhook_url', '') %}
+{% set slack_channel = data.get('slack_channel', '') %}
+{% set webhook_title = 'Paste the Webhook URL you copied from the link above after adding the incoming webhooks integration. Ensure you select your preferred Slack channel to post messages to.' %}
+{% set channel_title = 'Enter the Slack channel you want to post messages to. Ensure you have selected this channel when adding incoming webhooks integration. ' %}
+
+{# This renders a form for an organization to register their slack details. It can
+then itself be extended to add/remove blocks of functionality. #}
+
+<form class="form-horizontal channels" action="" method="post">
+
+  <input type="hidden" id="organization_id" name="organization_id" value="{{ data.get('organization_id', '') }}" />
+
+  {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
+
+  <div style="position:relative;">
+    {% block webhook %}
+      {{ form.input("webhook_url", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook_url, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
+      <i class="icon-question-sign" style="position: absolute; right: 1%; top: 25%;" title="{{webhook_title}}"></i>
+    {% endblock %}
+  </div>
+
+  <div style="position:relative;">
+    {% block channel %}
+      {{ form.input("slack_channel", id="field-channel", label=_("Slack Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
+      <i class="icon-question-sign" style="position: absolute; right: 47%; top: 25%;" title="{{channel_title}}"></i>
+    {% endblock %}
+  </div>
+
+  <div class="form-actions">
+    {% block form_actions %}
+    <button class="btn btn-primary" type="submit" name="save">
+      {% if new_form %}
+      {{ _("Get Notifications") }}
+      {% else %}
+      {{ _("Update Notification Channel") }}
+      {% endif %}
+    </button>
+    {% endblock %}
+  </div>
+
+</form>
