@@ -1,0 +1,104 @@
+{% extends "notify/base.html" %}
+
+{% block page_primary_action %}
+  <div class="page_primary_action">
+  {% link_for _('Add Channel'), controller='ckanext.notify.controllers.ui_controller:DataRequestsNotifyUI', action='add_channel', id=c.group_dict.name, class_='btn btn-primary', icon='plus-sign-alt' %}
+  </div>
+{% endblock %}
+
+{% block primary_content_inner %}
+  <div class="channels">
+    <h2 class="page-heading">{% trans %}DataRequest Notification Channels{% endtrans %}</h2>
+    <h3>{{ _('Slack') }}</h3>
+    {% if slack_channels %}
+    <table class="table table-header table-hover table-bordered">
+      <col width="70%" />
+      <col width="18%" />
+      <col width="12%" />
+      <thead>
+        <tr>
+          <th scope="col">{{ _('Webhook URL') }}</th>
+          <th scope="col">{{ _('Slack Channel') }}</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for channel in slack_channels %}
+          <tr>
+            <td>
+              {{ channel.webhook_url }}
+            </td>
+            <td>
+              {{ channel.slack_channel }}
+            </td>
+            <td>
+              {% set locale = h.dump_json({'content': _('Are you sure you want to delete this notification channel?')}) %}
+              <div class="btn-group pull-right">
+                <a class="btn btn-small" href="{{ h.url_for('update_slack_form', id=channel.id, organization_id=channel.organization_id) }}" title="{{ _('Edit') }}">
+                  <i class="icon-wrench"></i>
+                </a>
+                <a class="btn btn-danger btn-small" href="{{ h.url_for('delete_slack_form', id=channel.id, organization_id=channel.organization_id) }}" data-module="confirm-action" data-module-i18n="{{ locale }}" title="{{ _('Delete') }}">
+                  <i class="icon-remove"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div>
+      <p>{% trans %}You have not added a slack notification channel{% endtrans %}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="channels">
+    <h3>Email</h3>
+    {% if email_channels %}
+    <table class="table table-header table-hover table-bordered">
+      <col width="70%" />
+      <col width="30%" />
+      <thead>
+        <tr>
+          <th scope="col">{{ _('Email Address') }}</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for channel in email_channels %}
+          <tr>
+            <td>
+              To: {{ channel.email }}
+            </td>
+            <td>
+              {% set locale = h.dump_json({'content': _('Are you sure you want to delete this notification channel?')}) %}
+              <div class="btn-group pull-right">
+                <a class="btn btn-small" href="{{ h.url_for('update_email_form', id=channel.id, organization_id=channel.organization_id) }}" title="{{ _('Edit') }}">
+                  <i class="icon-wrench"></i>
+                </a>
+                <a class="btn btn-danger btn-small" href="{{ h.url_for('delete_email_form', id=channel.id, organization_id=channel.organization_id) }}" data-module="confirm-action" data-module-i18n="{{ locale }}" title="{{ _('Delete') }}">
+                  <i class="icon-remove"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div>
+      <p>{% trans %}You have not added an email notification channel{% endtrans %}</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block secondary_content_additional_info %}
+  <p>
+      {% trans %}
+      You will, most likely, need only one channel of notification - either email or slack. However, you can add both
+      channels if you need them. It's also possible to have two or more email or slack notification channels.
+      {% endtrans %}
+  </p>
+{% endblock %}
