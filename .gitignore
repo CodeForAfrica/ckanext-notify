@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+#IDE files
+.idea
+
+#Solr files
+solr

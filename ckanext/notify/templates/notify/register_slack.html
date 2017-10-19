@@ -1,0 +1,30 @@
+{% extends "notify/forms.html" %}
+
+{% block subtitle %}{{ _('Slack Notification') }} - {{ super() }}{% endblock %}
+
+{% block primary_content_inner %}
+    <div class="channel-page">
+        <div class="channel-page-header">
+            <h2>{{ _('Slack Notification') }}</h2>
+            <p>
+                {% trans %}
+                Get datarequest notifications on slack. Start by setting up an
+                <a href="https://my.slack.com/services/new/incoming-webhook/" target="_blank">
+                    incoming webhook integration
+                </a>
+                in your Slack workspace.
+                {% endtrans %}
+            </p>
+        </div>
+    </div>
+    {% snippet "notify/snippets/slack_form.html", data=data, errors=errors, errors_summary=errors_summary, new_form=new_form %}
+{% endblock %}
+
+{% block secondary_content_additional_info %}
+  <p>
+      {% trans %}
+      To receive datarequest notifications on Slack, fill the form. Ensure to enter the required fields correctly. Hover
+      on the question mark icon beside each field to get more information on the required input.
+      {% endtrans %}
+  </p>
+{% endblock %}

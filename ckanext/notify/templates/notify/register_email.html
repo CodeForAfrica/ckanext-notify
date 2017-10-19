@@ -1,0 +1,18 @@
+{% extends "notify/forms.html" %}
+
+{% block subtitle %}{{ _('Email Notification') }} - {{ super() }}{% endblock %}
+
+{% block primary_content_inner %}
+    <div class="channel-page">
+        <div class="channel-page-header">
+            <h2>{{ _('Email Notification') }}</h2>
+            <p>{{ _('Get notified on email about datarequest activities concerning your organization') }}</p>
+        </div>
+    </div>
+    {% snippet "notify/snippets/email_form.html", data=data, errors=errors, errors_summary=errors_summary, new_form=new_form %}
+{% endblock %}
+
+{% block secondary_content_additional_info %}
+  <p>{% trans %}To receive DataRequest notifications on email, enter the email address to send notification to.{% endtrans %}
+  </p>
+{% endblock %}

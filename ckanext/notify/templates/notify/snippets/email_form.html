@@ -1,0 +1,30 @@
+{% import "macros/form.html" as form %}
+
+{% set email = data.get('email', '') %}
+
+{# This renders a form for an organization to register their email details. It can
+then itself be extended to add/remove blocks of functionality. #}
+
+<form class="form-horizontal channels" action="" method="post">
+
+  <input type="hidden" id="organization_id" name="organization_id" value="{{ data.get('organization_id', '') }}" />
+  {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
+
+  {% block email %}
+    {{ form.input("email", id="field-email", label=_("Email"), placeholder=_("john@gmail.com"), value=email, error=errors['Email'], classes=["control-full"], is_required=true) }}
+  {% endblock %}
+
+  <div class="form-actions">
+    {% block form_actions %}
+    <button class="btn btn-primary" type="submit" name="save">
+      {% if new_form %}
+      {{ _("Get Notifications") }}
+      {% else %}
+      {{ _("Update Notification Channel") }}
+      {% endif %}
+    </button>
+    {% endblock %}
+  </div>
+
+
+</form>
