@@ -265,6 +265,19 @@ def slack_channel_delete(context, data_dict):
     session.commit()
 
 
+def get_slack_details(context, data_dict):
+    model = context['model']
+    session = context['session']
+    id = data_dict['organization'].get('name')
+
+    # Init the data base
+    db.init_db(model)
+    # Get the slack channel
+    result = db.Org_Slack_Details.get(organization_id=id)
+    if result:
+        return result
+
+
 def datarequest_register_email(context, data_dict):
     '''
     Action to register the organization email address used for notifications.
