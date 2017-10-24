@@ -1,9 +1,13 @@
 import logging
+import requests
+import json
+import ckanext.notify.db as db
 import ckan.model as model
 import ckan.lib.base as base
 import ckan.plugins as plugins
 import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
+from ckan.common import config
 
 from ckan.common import request
 
@@ -234,3 +238,35 @@ class DataRequestsNotifyUI(base.BaseController):
         except toolkit.NotAuthorized as e:
             log.warning(e)
             toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))
+
+    def send_slack_notification(self, result):
+        # Org members are notified via slack when data request is created
+        context = self._get_context()
+        datarequest_url = config.get('ckan.site_url') + \
+            '/datarequest/' + result['id']
+
+        extra_vars = {
+                        'site_title': config.get('ckan.site_title'),
+                        'site_url': config.get('ckan.site_url'),
+                        'datarequest_title': result['title'],
+                        'datarequest_description': result['description'],
+                        'datarequest_url': datarequest_url,
+                    }
+
+        info = toolkit.get_action(constants.GET_SLACK_INFO)(context,
+                                                            data_dict=result)
+        if info:
+            slack_data = {'text': base.render_jinja2('emails/slack_notify_request_body.txt',
+                          extra_vars),
+                          'username': config.get('slack.username'),
+                          'channel': info[0].slack_channel
+                          }
+            response = requests.post(
+                info[0].webhook_url, data=json.dumps(slack_data),
+                headers={'Content-Type': 'application/json'}
+            )
+            if response.status_code != 200:
+                raise ValueError(
+                    'Request to slack returned an error %s, the response is:\n%s'
+                    % (response.status_code, response.text)
+                )
