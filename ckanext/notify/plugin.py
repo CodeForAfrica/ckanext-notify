@@ -29,7 +29,6 @@ class NotifyPlugin(plugins.SingletonPlugin):
             constants.SLACK_CHANNEL_SHOW: actions.slack_channel_show,
             constants.SLACK_CHANNEL_UPDATE: actions.slack_channel_update,
             constants.SLACK_CHANNEL_DELETE: actions.slack_channel_delete,
-            constants.GET_SLACK_INFO: actions.get_slack_details,
             constants.DATAREQUEST_REGISTER_EMAIL: actions.datarequest_register_email,
             constants.EMAIL_CHANNELS_SHOW: actions.email_channels_show,
             constants.EMAIL_CHANNEL_SHOW: actions.email_channel_show,

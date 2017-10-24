@@ -1,15 +1,13 @@
+import json
 import logging
 import requests
-import json
-import ckanext.notify.db as db
 import ckan.model as model
 import ckan.lib.base as base
 import ckan.plugins as plugins
 import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
-from ckan.common import config
 
-from ckan.common import request
+from ckan.common import config, request
 
 log = logging.getLogger(__name__)
 toolkit = plugins.toolkit
@@ -240,33 +238,36 @@ class DataRequestsNotifyUI(base.BaseController):
             toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))
 
     def send_slack_notification(self, result):
-        # Org members are notified via slack when data request is created
+        '''
+        This function is called from ckanext-datarequest after a DataRequest is
+        created, commented on or closed. The organization selected during the
+        DataRequest creation is sent a slack notification if an admin has
+        added Slack as a notification channel.
+        '''
+
         context = self._get_context()
-        datarequest_url = config.get('ckan.site_url') + \
-            '/datarequest/' + result['id']
+        site_url = config.get('ckan.site_url')
+        datarequest_url = site_url + constants.DATAREQUEST_LINK + result['id']
 
-        extra_vars = {
-                        'site_title': config.get('ckan.site_title'),
-                        'site_url': config.get('ckan.site_url'),
-                        'datarequest_title': result['title'],
-                        'datarequest_description': result['description'],
-                        'datarequest_url': datarequest_url,
-                    }
+        data_dict = {
+            'organization_id': result['organization'].get('name'),
+            'success': True,
+        }
 
-        info = toolkit.get_action(constants.GET_SLACK_INFO)(context,
-                                                            data_dict=result)
-        if info:
-            slack_data = {'text': base.render_jinja2('emails/slack_notify_request_body.txt',
-                          extra_vars),
-                          'username': config.get('slack.username'),
-                          'channel': info[0].slack_channel
-                          }
-            response = requests.post(
-                info[0].webhook_url, data=json.dumps(slack_data),
-                headers={'Content-Type': 'application/json'}
-            )
-            if response.status_code != 200:
-                raise ValueError(
-                    'Request to slack returned an error %s, the response is:\n%s'
-                    % (response.status_code, response.text)
+        channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
+
+        if channels:
+            extra_vars = {
+                            'site_url': site_url,
+                            'site_title': config.get('ckan.site_title'),
+                            'datarequest_url': datarequest_url,
+                            'datarequest_title': result['title'],
+                            'datarequest_description': result['description'],
+                        }
+            slack_message = {'text': base.render_jinja2('notify/slack/datarequest_create.txt', extra_vars)}
+
+            for channel in channels:
+                requests.post(
+                    channel['webhook_url'], data=json.dumps(slack_message),
+                    headers={'Content-Type': 'application/json'}
                 )
