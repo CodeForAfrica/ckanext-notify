@@ -247,7 +247,6 @@ class DataRequestsNotifyUI(base.BaseController):
 
         context = self._get_context()
         site_url = config.get('ckan.site_url')
-        datarequest_url = site_url + constants.DATAREQUEST_LINK + result['id']
 
         data_dict = {
             'organization_id': result['organization'].get('name'),
@@ -260,11 +259,11 @@ class DataRequestsNotifyUI(base.BaseController):
             extra_vars = {
                             'site_url': site_url,
                             'site_title': config.get('ckan.site_title'),
-                            'datarequest_url': datarequest_url,
+                            'datarequest_url': result['datarequest_url'],
                             'datarequest_title': result['title'],
                             'datarequest_description': result['description'],
                         }
-            slack_message = {'text': base.render_jinja2('notify/slack/datarequest_create.txt', extra_vars)}
+            slack_message = {'text': base.render_jinja2(result['body'], extra_vars)}
 
             for channel in channels:
                 requests.post(
