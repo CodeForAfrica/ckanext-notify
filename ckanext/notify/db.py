@@ -47,10 +47,14 @@ def init_db(model):
                 return query.filter_by(**kw).all()
 
             @classmethod
-            def slack_channel_exists(cls, webhook_url):
-                '''Returns true if there is a slack channel with the same webhook url'''
+            def slack_channel_exists(cls, webhook_url, slack_channel):
+                '''Returns true if there is a channel with the same webhook url and slack channel'''
                 query = model.Session.query(cls).autoflush(False)
-                return query.filter(cls.webhook_url == webhook_url).first() is not None
+                if query.filter(cls.webhook_url == webhook_url).first() is None:
+                    return False
+                else:
+                    return query.filter(cls.webhook_url == webhook_url)\
+                        .filter(cls.slack_channel == slack_channel).first()
 
         Org_Slack_Details = _Org_Slack_Details
 
@@ -74,6 +78,12 @@ def init_db(model):
                 '''Finds all the instances required.'''
                 query = model.Session.query(cls).autoflush(False)
                 return query.filter_by(**kw).all()
+
+            @classmethod
+            def email_channel_exists(cls, email):
+                '''Returns true if there is a email channel with the same webhook url'''
+                query = model.Session.query(cls).autoflush(False)
+                return query.filter(cls.email == email).first() is not None
 
         Org_Email_Details = _Org_Email_Details
 

@@ -1,7 +1,7 @@
-A new data request has been added to {{ site_title }}:
+A new DataRequest has been created on {{ site_title }}:
 
 Title: {{ datarequest_title }}
-Description:
-{{ datarequest_description }}
 
-You can access it at {{ datarequest_url }} .
+Description: {{ datarequest_description }}
+
+<{{ datarequest_url }}|Click here> to view!

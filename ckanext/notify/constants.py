@@ -1,6 +1,5 @@
 DATAREQUEST_REGISTER_SLACK = 'datarequest_register_slack'
 DATAREQUEST_REGISTER_EMAIL = 'datarequest_register_email'
-DATAREQUEST_LINK = '/datarequest/'
 MANAGE_NOTIFICATIONS = 'manage_notifications'
 SLACK_CHANNELS_SHOW = 'slack_channels_show'
 SLACK_CHANNEL_SHOW = 'slack_channel_show'

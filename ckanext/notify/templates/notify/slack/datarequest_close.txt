@@ -1,3 +1,3 @@
-DataRequest {{ datarequest_title }} has been closed
+DataRequest {{ datarequest_title }} has been closed on {{ site_title }}.
 
-You can access it at {{ datarequest_url }} .
+<{{ datarequest_url }}|Click here> to view!

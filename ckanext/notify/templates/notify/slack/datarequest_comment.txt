@@ -1,5 +1,5 @@
-A comment has been added on Data Request {{ datarequest_title }}:
+A comment has been made on a DataRequest to your organization on {{ site_title }}.
 
-{{ comment }}
+Title: {{ datarequest_title }}
 
-You can access it at {{ datarequest_url }} .
+<{{ datarequest_url }}|Click here> to view!

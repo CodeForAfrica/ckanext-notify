@@ -106,7 +106,7 @@ def slack_channels_show(context, data_dict):
     '''
 
     model = context['model']
-    organization_id = data_dict.get('organization_id', '')
+    organization_id = data_dict.get('organization_id')
     success = data_dict.get('success', False)
 
     if not organization_id and not success:
@@ -374,7 +374,7 @@ def email_channels_show(context, data_dict):
     if result:
         email_channels = [_dictize_email_details(channel) for channel in result]
     else:
-        email_channels = {}
+        email_channels = []
 
     return email_channels
 

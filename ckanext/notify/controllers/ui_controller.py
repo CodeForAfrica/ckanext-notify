@@ -246,15 +246,15 @@ class DataRequestsNotifyUI(base.BaseController):
         '''
 
         context = self._get_context()
+        organization = result.get('organization', None)
         data_dict = {
-            'organization_id': result['organization'].get('name'),
+            'organization_id': organization['name'] if organization else '',
             'success': True,
         }
 
         channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
         if channels:
             extra_vars = {
-                            'site_url': config.get('ckan.site_url'),
                             'site_title': config.get('ckan.site_title'),
                             'datarequest_url': result['datarequest_url'],
                             'datarequest_title': result['title'],
@@ -265,5 +265,5 @@ class DataRequestsNotifyUI(base.BaseController):
             for channel in channels:
                 requests.post(
                     channel['webhook_url'], data=json.dumps(slack_message),
-                    headers={'Content-Type': 'application/json'}
+                    headers={'Content-type': 'application/json'}
                 )

@@ -12,6 +12,10 @@ def validate_slack_form(context, request_data):
     errors = {}
 
     # Check webhook_url
+
+    if db.Org_Slack_Details.slack_channel_exists(request_data['webhook_url'], request_data['slack_channel']):
+            errors[toolkit._('Webhook URL')] = [toolkit._('The channel already exists')]
+
     if len(request_data['webhook_url']) > constants.WEBHOOK_MAX_LENGTH:
         errors[toolkit._('Webhook URL')] =\
             [toolkit._('Webhook URL must be a maximum of {} characters long').format(constants.WEBHOOK_MAX_LENGTH)]
@@ -21,9 +25,6 @@ def validate_slack_form(context, request_data):
 
     if not request_data['webhook_url']:
         errors[toolkit._('Webhook URL')] = [toolkit._('Webhook URL cannot be empty')]
-
-    if db.Org_Slack_Details.slack_channel_exists(request_data['webhook_url']):
-            errors[toolkit._('Webhook URL')] = [toolkit._('That slack channel already exists')]
 
     # Check channel
     if len(request_data['slack_channel']) > constants.CHANNEL_MAX_LENGTH:
@@ -42,6 +43,9 @@ def validate_slack_form(context, request_data):
 
 def validate_email_form(context, request_data):
     errors = {}
+
+    if db.Org_Email_Details.email_channel_exists(request_data['email']):
+            errors[toolkit._('Email')] = [toolkit._('The channel already exists')]
 
     if len(request_data['email']) > constants.EMAIL_MAX_LENGTH:
         errors[toolkit._('Email')] =\
