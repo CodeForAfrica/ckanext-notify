@@ -1,0 +1,3 @@
+DataRequest {{ datarequest_title }} has been closed
+
+You can access it at {{ datarequest_url }} .

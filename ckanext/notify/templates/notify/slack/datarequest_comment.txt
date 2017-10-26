@@ -1,0 +1,5 @@
+A comment has been added on Data Request {{ datarequest_title }}:
+
+{{ comment }}
+
+You can access it at {{ datarequest_url }} .

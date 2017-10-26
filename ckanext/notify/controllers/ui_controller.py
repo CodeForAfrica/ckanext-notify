@@ -237,7 +237,7 @@ class DataRequestsNotifyUI(base.BaseController):
             log.warning(e)
             toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))
 
-    def send_slack_notification(self, result):
+    def send_slack_notification(self, template, result):
         '''
         This function is called from ckanext-datarequest after a DataRequest is
         created, commented on or closed. The organization selected during the
@@ -246,24 +246,21 @@ class DataRequestsNotifyUI(base.BaseController):
         '''
 
         context = self._get_context()
-        site_url = config.get('ckan.site_url')
-
         data_dict = {
             'organization_id': result['organization'].get('name'),
             'success': True,
         }
 
         channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
-
         if channels:
             extra_vars = {
-                            'site_url': site_url,
+                            'site_url': config.get('ckan.site_url'),
                             'site_title': config.get('ckan.site_title'),
                             'datarequest_url': result['datarequest_url'],
                             'datarequest_title': result['title'],
                             'datarequest_description': result['description'],
                         }
-            slack_message = {'text': base.render_jinja2(result['body'], extra_vars)}
+            slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
 
             for channel in channels:
                 requests.post(
