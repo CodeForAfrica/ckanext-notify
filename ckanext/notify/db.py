@@ -46,6 +46,12 @@ def init_db(model):
                 query = model.Session.query(cls).autoflush(False)
                 return query.filter_by(**kw).all()
 
+            @classmethod
+            def slack_channel_exists(cls, webhook_url):
+                '''Returns true if there is a slack channel with the same webhook url'''
+                query = model.Session.query(cls).autoflush(False)
+                return query.filter(cls.webhook_url == webhook_url).first() is not None
+
         Org_Slack_Details = _Org_Slack_Details
 
         org_slack_details_table = sa.Table('org_slack_details', model.meta.metadata,

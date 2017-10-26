@@ -1,5 +1,6 @@
 import constants
 import ckan.plugins.toolkit as toolkit
+import ckanext.notify.db as db
 import re
 
 _space_or_period = re.compile(r'\.|\s|#')
@@ -20,6 +21,9 @@ def validate_slack_form(context, request_data):
 
     if not request_data['webhook_url']:
         errors[toolkit._('Webhook URL')] = [toolkit._('Webhook URL cannot be empty')]
+
+    if db.Org_Slack_Details.slack_channel_exists(request_data['webhook_url']):
+            errors[toolkit._('Webhook URL')] = [toolkit._('That slack channel already exists')]
 
     # Check channel
     if len(request_data['slack_channel']) > constants.CHANNEL_MAX_LENGTH:
