@@ -1,0 +1,6 @@
+sudo: required
+language: python
+env: PGVERSION=9.1
+install:
+    - bash bin/travis-build.bash
+script: sh bin/travis-run.sh
