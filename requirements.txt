@@ -5,7 +5,6 @@ blinker==1.4
 -e git+https://github.com/ckan/ckan.git@638262b96feef48e56da0d95f8dd3686092c5ae3#egg=ckan
 ckanext-datarequests==0.3.2
 -e git+https://github.com/okfn/ckanext-harvest.git@b589797c47df2bb6b44f11e7adbe3b50a86b2842#egg=ckanext_harvest
-ckanext-notify==0.0.1
 -e git+https://github.com/andela/ckanext-openafrica.git@25de29207f6e8494631c07cdd06cc72569d810f9#egg=ckanext_openafrica
 click==6.7
 decorator==4.0.6
