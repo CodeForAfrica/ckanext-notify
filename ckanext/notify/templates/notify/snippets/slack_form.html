@@ -14,16 +14,19 @@ then itself be extended to add/remove blocks of functionality. #}
 
   {% block errors %}{{ form.errors(errors_summary) }}{% endblock %}
 
-  {% block webhook %}
-    {{ form.input("webhook_url", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook_url, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
-  {% endblock %}
+  <div style="position:relative;">
+    {% block webhook %}
+      {{ form.input("webhook_url", id="field-webhook", label=_("Webhook URL"), placeholder=_("https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"), value=webhook_url, error=errors['Webhook URL'], classes=["control-full"], is_required=true) }}
+      <i class="icon-question-sign" style="position: absolute; right: 1%; top: 25%;" title="{{webhook_title}}"></i>
+    {% endblock %}
+  </div>
 
-  {% block channel %}
-    {{ form.input("slack_channel", id="field-channel", label=_("Slack Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
-  {% endblock %}
-
-  <i class="icon-question-sign" style=" position: absolute; left: 95%; bottom: 37%;" title="{{webhook_title}}"></i>
-  <i class="icon-question-sign" style=" position: absolute; left: 61%; bottom: 25%;" title="{{channel_title}}"></i>
+  <div style="position:relative;">
+    {% block channel %}
+      {{ form.input("slack_channel", id="field-channel", label=_("Slack Channel"), placeholder=_("eg. datarequest_activities"), value=slack_channel, error=errors['Channel'], classes=["control-medium"], is_required=true) }}
+      <i class="icon-question-sign" style="position: absolute; right: 47%; top: 25%;" title="{{channel_title}}"></i>
+    {% endblock %}
+  </div>
 
   <div class="form-actions">
     {% block form_actions %}

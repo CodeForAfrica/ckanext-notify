@@ -1,9 +1,7 @@
-import constants
-from ckan.plugins import toolkit as toolkit
 import ckan.lib.helpers as helpers
 
 
-def datarequest_register_slack(context, data_dict):
+def manage_notifications(context, data_dict):
     my_organizations = helpers.organizations_available()
     can_manage = [org['name'] for org in my_organizations]
     if data_dict['organization_id'] in can_manage:
