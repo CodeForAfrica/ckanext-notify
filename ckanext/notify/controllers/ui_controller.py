@@ -7,7 +7,14 @@ import ckan.plugins as plugins
 import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
 
+<<<<<<< HEAD
 from ckan.common import config, request
+=======
+from pylons import config
+import ckan.lib.mailer as mailer
+
+from ckan.common import request
+>>>>>>> send email notification to organization
 
 log = logging.getLogger(__name__)
 toolkit = plugins.toolkit
@@ -22,6 +29,14 @@ def _get_errors_summary(errors):
 
     return errors_summary
 
+
+class dotdict(dict):
+
+    """dot.notation access to dictionary attributes"""
+
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 class DataRequestsNotifyUI(base.BaseController):
 
@@ -255,15 +270,44 @@ class DataRequestsNotifyUI(base.BaseController):
         channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
         if channels:
             extra_vars = {
-                            'site_title': config.get('ckan.site_title'),
-                            'datarequest_url': result['datarequest_url'],
-                            'datarequest_title': result['title'],
-                            'datarequest_description': result['description'],
-                        }
-            slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
+                slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
 
             for channel in channels:
                 requests.post(
                     channel['webhook_url'], data=json.dumps(slack_message),
                     headers={'Content-type': 'application/json'}
                 )
+
+    def send_email_notification(self, template, result):
+        '''
+         This function is called from ckanext-datarequest after a DataRequest is
+         created, commented on or closed. The organization selected during the
+         DataRequest creation is sent an email notification if an admin has
+         added an email address for notification.
+         '''
+        context = self._get_context()
+        data_dict = {
+            'organization_id': result['organization'].get('name'),
+            'success': True,
+        }
+
+        channels = toolkit.get_action(constants.EMAIL_CHANNELS_SHOW)(context, data_dict)
+        print 'this is channels', channels
+        if channels:
+            extra_vars = {
+                            'site_url': config.get('ckan.site_url'),
+                            'site_title': config.get('ckan.site_title'),
+                            'datarequest_url': result['datarequest_url'],
+                            'datarequest_title': result['title'],
+                            'datarequest_description': result['description'],
+                        }
+
+            email_subject = {'text': base.render_jinja2('notify/email/{}.txt'.format('subject'), extra_vars)}
+            email_body = {'text': base.render_jinja2('notify/email/{}.txt'.format(template), extra_vars)}
+
+            for channel in channels:
+                # channel['encode'] = 'utf-8'
+                # print channel
+                channel = dotdict(channel)
+                # email_body['encode'] = 'utf-8'                
+                mailer.mail_user(channel, email_subject, email_body)
