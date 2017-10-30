@@ -1,0 +1,7 @@
+A new DataRequest has been created on {{ site_title }}:
+
+Title: {{ datarequest_title }}
+
+Description: {{ datarequest_description }}
+
+<{{ datarequest_url }}|Click here> to view!

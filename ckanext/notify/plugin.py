@@ -1,9 +1,8 @@
 import ckan.plugins as plugins
+import ckan.plugins.toolkit as toolkit
 import constants
 import actions
 import auth
-
-toolkit = plugins.toolkit
 
 
 class NotifyPlugin(plugins.SingletonPlugin):
@@ -12,6 +11,7 @@ class NotifyPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IMapper)
 
     # IConfigurer
 

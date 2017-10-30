@@ -1,0 +1,5 @@
+A comment has been made on a DataRequest to your organization on {{ site_title }}.
+
+Title: {{ datarequest_title }}
+
+<{{ datarequest_url }}|Click here> to view!

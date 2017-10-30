@@ -1,0 +1,3 @@
+DataRequest {{ datarequest_title }} has been closed on {{ site_title }}.
+
+<{{ datarequest_url }}|Click here> to view!
