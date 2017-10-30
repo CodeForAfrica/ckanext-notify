@@ -1,11 +1,13 @@
+import json
 import logging
+import requests
 import ckan.model as model
 import ckan.lib.base as base
 import ckan.plugins as plugins
 import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
 
-from ckan.common import request
+from ckan.common import config, request
 
 log = logging.getLogger(__name__)
 toolkit = plugins.toolkit
@@ -234,3 +236,34 @@ class DataRequestsNotifyUI(base.BaseController):
         except toolkit.NotAuthorized as e:
             log.warning(e)
             toolkit.abort(403, toolkit._('You are not authorized to delete the channel {0}'.format(id)))
+
+    def send_slack_notification(self, template, result):
+        '''
+        This function is called from ckanext-datarequest after a DataRequest is
+        created, commented on or closed. The organization selected during the
+        DataRequest creation is sent a slack notification if an admin has
+        added Slack as a notification channel.
+        '''
+
+        context = self._get_context()
+        organization = result.get('organization', None)
+        data_dict = {
+            'organization_id': organization['name'] if organization else '',
+            'success': True,
+        }
+
+        channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
+        if channels:
+            extra_vars = {
+                            'site_title': config.get('ckan.site_title'),
+                            'datarequest_url': result['datarequest_url'],
+                            'datarequest_title': result['title'],
+                            'datarequest_description': result['description'],
+                        }
+            slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
+
+            for channel in channels:
+                requests.post(
+                    channel['webhook_url'], data=json.dumps(slack_message),
+                    headers={'Content-type': 'application/json'}
+                )
