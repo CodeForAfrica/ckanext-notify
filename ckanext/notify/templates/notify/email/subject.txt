@@ -1,1 +1,1 @@
-[{{ site_title }}] New DataRequest
+[{{ site_title }}] {{ action_type }}
