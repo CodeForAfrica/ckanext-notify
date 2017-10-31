@@ -292,7 +292,6 @@ class DataRequestsNotifyUI(base.BaseController):
         }
 
         channels = toolkit.get_action(constants.EMAIL_CHANNELS_SHOW)(context, data_dict)
-        print 'this is channels', channels
         if channels:
             extra_vars = {
                             'site_url': config.get('ckan.site_url'),
@@ -300,14 +299,17 @@ class DataRequestsNotifyUI(base.BaseController):
                             'datarequest_url': result['datarequest_url'],
                             'datarequest_title': result['title'],
                             'datarequest_description': result['description'],
+                            'action_type': template,
                         }
 
-            email_subject = {'text': base.render_jinja2('notify/email/{}.txt'.format('subject'), extra_vars)}
-            email_body = {'text': base.render_jinja2('notify/email/{}.txt'.format(template), extra_vars)}
+            email_subject = base.render_jinja2('notify/email/{}.txt'.format('subject'), extra_vars)
+            email_body = base.render_jinja2('notify/email/{}.txt'.format(template), extra_vars)
 
             for channel in channels:
                 # channel['encode'] = 'utf-8'
                 # print channel
                 channel = dotdict(channel)
                 # email_body['encode'] = 'utf-8'                
+                mailer.mail_user(channel, email_subject, email_body)
+                channel = dotdict(channel)              
                 mailer.mail_user(channel, email_subject, email_body)
