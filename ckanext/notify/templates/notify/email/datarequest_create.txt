@@ -1,10 +1,9 @@
-Dear Sir/Ma,
+Hello,
 
-A new data request has been added to {{ site_title }}:
+A new data request has been created on {{ site_title }}:
 
 Title: {{ datarequest_title }}
-Description:
-{{ datarequest_description }}
+Description: {{ datarequest_description }}
 
 You can access it at {{ datarequest_url }} .
 
