@@ -7,14 +7,9 @@ import ckan.plugins as plugins
 import ckan.lib.helpers as helpers
 import ckanext.notify.constants as constants
 
-<<<<<<< HEAD
 from ckan.common import config, request
-=======
-from pylons import config
 import ckan.lib.mailer as mailer
 
-from ckan.common import request
->>>>>>> send email notification to organization
 
 log = logging.getLogger(__name__)
 toolkit = plugins.toolkit
@@ -270,7 +265,12 @@ class DataRequestsNotifyUI(base.BaseController):
         channels = toolkit.get_action(constants.SLACK_CHANNELS_SHOW)(context, data_dict)
         if channels:
             extra_vars = {
-                slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
+                            'site_title': config.get('ckan.site_title'),
+                            'datarequest_url': result['datarequest_url'],
+                            'datarequest_title': result['title'],
+                            'datarequest_description': result['description'],
+                        }
+            slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
 
             for channel in channels:
                 requests.post(
@@ -306,10 +306,5 @@ class DataRequestsNotifyUI(base.BaseController):
             email_body = base.render_jinja2('notify/email/{}.txt'.format(template), extra_vars)
 
             for channel in channels:
-                # channel['encode'] = 'utf-8'
-                # print channel
-                channel = dotdict(channel)
-                # email_body['encode'] = 'utf-8'                
-                mailer.mail_user(channel, email_subject, email_body)
                 channel = dotdict(channel)              
                 mailer.mail_user(channel, email_subject, email_body)
