@@ -3,6 +3,7 @@ ckanext-datarequests==0.3.2
 Pylons==0.9.7
 pysolr==3.6.0
 python-dateutil==1.5
+pyutilib.component.core==4.6.4
 python-magic==0.4.12
 redis==2.10.5
 requests==2.11.1
@@ -10,7 +11,6 @@ Routes==1.13
 rq==0.6.0
 selenium==3.6.0
 simplejson==3.10.0
-six==1.10.0
 slackclient==1.0.9
 SQLAlchemy==0.9.6
 sqlalchemy-migrate==0.10.0
