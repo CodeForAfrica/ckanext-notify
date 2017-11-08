@@ -1,9 +1,11 @@
 sudo: required
 language: python
 env: PGVERSION=9.1
+services:
+    - redis-server
+    - postgresql
 install:
-    - pip install -r requirements.txt
-    - pip install coveralls
-script: nosetests
+    - bash bin/travis-build.bash
+script: sh bin/travis-run.sh
 after_success:
     - coveralls
