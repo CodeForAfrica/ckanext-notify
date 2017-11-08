@@ -1,6 +1,9 @@
 sudo: required
 language: python
 env: PGVERSION=9.1
+services:
+    - redis-server
+    - postgresql
 install:
     - pip install -r dev-requirements.txt
     - pip install coveralls
