@@ -1,0 +1,1 @@
+[{{ site_title }}] {{ action_type }}

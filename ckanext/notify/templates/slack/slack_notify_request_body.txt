@@ -1,7 +1,0 @@
-A new data request has been added to {{ site_title }}:
-
-Title: {{ datarequest_title }}
-Description:
-{{ datarequest_description }}
-
-You can access it at {{ datarequest_url }} .

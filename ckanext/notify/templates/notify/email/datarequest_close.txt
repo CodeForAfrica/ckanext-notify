@@ -1,0 +1,11 @@
+Hello,
+
+A data request has been closed in {{ site_title }}:
+
+Title: {{ datarequest_title }}
+Description: {{ datarequest_description }}
+
+You can access it at {{ datarequest_url }} .
+
+Have a nice day.
+Message sent by {{ site_title }} ({{ site_url }})

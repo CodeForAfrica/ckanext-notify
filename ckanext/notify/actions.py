@@ -1,17 +1,8 @@
-import ckan.logic as logic
-import ckan.model as model
-import ckan.lib.base as base
 import ckan.plugins as plugins
-import ckan.lib.mailer as mailer
+import ckan.logic as logic
 import constants
 import validator
-import json
-import requests
 import db
-
-
-from ckan.common import _, config
-from socket import error as socket_error
 
 toolkit = plugins.toolkit
 c = toolkit.c
@@ -115,23 +106,25 @@ def slack_channels_show(context, data_dict):
     '''
 
     model = context['model']
-    organization_id = data_dict.get('organization_id', '')
+    organization_id = data_dict.get('organization_id')
+    success = data_dict.get('success', False)
 
-    if not organization_id:
+    if not organization_id and not success:
         raise toolkit.ValidationError(toolkit._('Organization ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
+    if not success:
+        toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the available slack channels
     result = db.Org_Slack_Details.get(organization_id=organization_id)
     if result:
         slack_channels = [_dictize_slack_details(channel) for channel in result]
     else:
-        slack_channels = {}
+        slack_channels = []
 
     return slack_channels
 
@@ -366,22 +359,24 @@ def email_channels_show(context, data_dict):
 
     model = context['model']
     organization_id = data_dict.get('organization_id', '')
+    success = data_dict.get('success', False)
 
-    if not organization_id:
+    if not organization_id and not success:
         raise toolkit.ValidationError(toolkit._('Organization ID has not been included'))
 
     # Init the data base
     db.init_db(model)
 
     # Check access
-    toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
+    if not success:
+        toolkit.check_access(constants.MANAGE_NOTIFICATIONS, context, data_dict)
 
     # Get the available slack channels
     result = db.Org_Email_Details.get(organization_id=organization_id)
     if result:
         email_channels = [_dictize_email_details(channel) for channel in result]
     else:
-        email_channels = {}
+        email_channels = []
 
     return email_channels
 
