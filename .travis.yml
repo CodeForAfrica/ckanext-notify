@@ -2,8 +2,8 @@ sudo: required
 language: python
 env: PGVERSION=9.1
 install:
-    - pip install -r dev-requirements.txt
+    - bash bin/travis-build.bash
     - pip install coveralls
-script: nosetests
+script: sh bin/travis-run.sh
 after_success:
     - coveralls
