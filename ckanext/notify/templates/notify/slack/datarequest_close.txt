@@ -1,4 +1,4 @@
-{"text": "*[CLOSED] Datarequest closed on the Organization: {{ site_title }}*\n\nIt appears you neglected your duties, a datarequest has been closed on {{ site_title }}. :sob:\n\n",
+{"text": "*[CLOSED] Datarequest closed on the Organization: {{ site_title }}*\n\nThe datarequest {{ datatrequest_title }} has been closed on {{ site_title }}. :sob:\n\n",
     "username": "datarequests-bot",
     "icon_emoji": ":monkey_face:",
     "attachments": [
