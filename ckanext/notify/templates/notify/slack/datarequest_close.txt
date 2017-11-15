@@ -1,3 +1,24 @@
-DataRequest {{ datarequest_title }} has been closed on {{ site_title }}.
-
-<{{ datarequest_url }}|Click here> to view!
+{"text": "*[CLOSED] Datarequest closed on the Organization: {{ site_title }}*\n\nThe datarequest {{ datatrequest_title }} has been closed on {{ site_title }}. :white_check_mark:\n\n",
+    "username": "datarequests-bot",
+    "icon_emoji": ":monkey_face:",
+    "attachments": [
+        {
+            "color": "danger",
+            "title": "Click me to view the closed datarequest",
+            "title_link": "{{ datarequest_url }}",
+            "text": "Datarequest description: {{ datarequest_description }}",
+            "thumb_url": "https://media.giphy.com/media/2rtQMJvhzOnRe/giphy.gif",
+            "fields": [
+                {
+                    "title": "Datarequest title",
+                    "value": "{{ datarequest_title }}",
+                    "short": true
+                },
+                {
+                    "title": "Organization",
+                    "value": "{{ site_title }}",
+                    "short": true
+                }
+            ]
+        }
+    ]}

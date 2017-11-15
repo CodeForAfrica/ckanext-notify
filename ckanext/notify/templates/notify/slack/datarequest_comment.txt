@@ -1,5 +1,24 @@
-A comment has been made on a DataRequest to your organization on {{ site_title }}.
-
-Title: {{ datarequest_title }}
-
-<{{ datarequest_url }}|Click here> to view!
+{"text": "*[COMMENT] A new comment has been made on a datarequest made to the Organization: {{ site_title }}*\n\nYou should probably head over there and check it out! :running:\n\n",
+    "username": "datarequests-bot",
+    "icon_emoji": ":monkey_face:",
+    "attachments": [
+        {
+            "color": "warning",
+            "title": "Click me to view the comment",
+            "title_link": "{{ datarequest_url }}",
+            "text": "Datarequest description: {{ datarequest_description }}",
+            "thumb_url": "https://media.giphy.com/media/26xBNjd32hiIE4UpO/giphy.gif",
+            "fields": [
+                {
+                    "title": "Datarequest title",
+                    "value": "{{ datarequest_title }}",
+                    "short": true
+                },
+                {
+                    "title": "Organization",
+                    "value": "{{ site_title }}",
+                    "short": true
+                }
+            ]
+        }
+    ]}

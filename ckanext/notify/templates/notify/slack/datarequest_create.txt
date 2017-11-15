@@ -1,7 +1,24 @@
-A new DataRequest has been created on {{ site_title }}:
-
-Title: {{ datarequest_title }}
-
-Description: {{ datarequest_description }}
-
-<{{ datarequest_url }}|Click here> to view!
+{"text": "*[NEW DATAREQUEST] Created on the Organization: {{ site_title }}*\n\nIt appears you have work to do, a new datarequest has been created on {{ site_title }}. :ghost:\n\n",
+	"username": "datarequests-bot",
+	"icon_emoji": ":monkey_face:",
+	"attachments": [
+		{
+			 "color": "#36a64f",
+			"title": "Click me to view the new datarequest",
+            "title_link": "{{ datarequest_url }}",
+			"text": "Datarequest description: {{ datarequest_description }}",
+			"thumb_url": "https://media.giphy.com/media/3o6Ei2uhPW2eRv4c8M/giphy.gif",
+			"fields": [
+                {
+                    "title": "Datarequest title",
+                    "value": "{{ datarequest_title }}",
+                    "short": true
+                },
+                {
+                    "title": "Organization",
+                    "value": "{{ site_title }}",
+                    "short": true
+                }
+            ]
+		}
+	]}

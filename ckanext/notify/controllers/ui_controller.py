@@ -270,11 +270,11 @@ class DataRequestsNotifyUI(base.BaseController):
                             'datarequest_title': result['title'],
                             'datarequest_description': result['description'],
                         }
-            slack_message = {'text': base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)}
+            slack_message = base.render_jinja2('notify/slack/{}.txt'.format(template), extra_vars)
 
             for channel in channels:
                 requests.post(
-                    channel['webhook_url'], data=json.dumps(slack_message),
+                    channel['webhook_url'], data=(slack_message),
                     headers={'Content-type': 'application/json'}
                 )
 
